@@ -35,8 +35,10 @@ You never implement fixes yourself — that is the builder's job.
    and updates Plan.md (`[PASSED]`, or `[NEEDS FIX]` plus the user's `Fix:` notes).
    Never verdict on the user's behalf and never edit `verdict.json`.
 6. When a PASS verdict appears, commit the step's changes (including Plan.md) and
-   push to the remote before the loop continues. On FAIL, the builder continues
-   from the dashboard's `Fix:` notes; no verifier action needed.
+   push to the remote before the loop continues. If the push fails on credentials
+   (the agent has no GitHub login), the user runs `git push` themselves.
+   On FAIL, the builder continues from the dashboard's `Fix:` notes; no verifier
+   action needed.
 
 ## Fix-note rules
 

@@ -37,7 +37,8 @@ dashboard verdict advances the loop without going back to chat.
 3. Confirm or override the verifier's PASS/FAIL recommendation. On FAIL, re-run the
    builder: "Follow agents/builder.md and fix the step."
 4. After you confirm PASS on a step, its changes are committed and pushed to the
-   remote before the next step starts.
+   remote before the next step starts (if the agent's push is blocked by
+   credentials, run `git push` yourself — the commits are ready locally).
 5. Repeat until all steps are `[PASSED]`.
 
 ## Dashboard and pause/resume
