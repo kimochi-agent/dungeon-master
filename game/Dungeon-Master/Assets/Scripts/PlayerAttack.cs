@@ -42,9 +42,9 @@ public class PlayerAttack : MonoBehaviour
             return true;
         if (Touchscreen.current != null)
         {
-            foreach (var touch in Touch.activeTouches)
+            foreach (var touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
             {
-                if (touch.phase == TouchPhase.Began && touch.screenPosition.x > Screen.width / 2f)
+                if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began && touch.screenPosition.x > Screen.width / 2f)
                     return true;
             }
         }

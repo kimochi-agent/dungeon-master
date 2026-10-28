@@ -51,12 +51,12 @@ public class TouchJoystick : MonoBehaviour
         root.SetActive(true);
 
         bool found = false;
-        foreach (var touch in Touch.activeTouches)
+        foreach (var touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
         {
             if (touch.touchId == activeTouchId)
             {
                 found = true;
-                if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+                if (touch.phase == UnityEngine.InputSystem.TouchPhase.Ended || touch.phase == UnityEngine.InputSystem.TouchPhase.Canceled)
                 {
                     Release();
                 }
@@ -69,7 +69,7 @@ public class TouchJoystick : MonoBehaviour
                     knob.anchoredPosition = delta / canvas.scaleFactor;
                 }
             }
-            else if (activeTouchId == -1 && touch.phase == TouchPhase.Began &&
+            else if (activeTouchId == -1 && touch.phase == UnityEngine.InputSystem.TouchPhase.Began &&
                      Vector2.Distance(touch.screenPosition, baseScreenPos) < radius * 1.6f)
             {
                 activeTouchId = touch.touchId;
