@@ -36,6 +36,10 @@ public static class GameBootstrap
             follow = camera.gameObject.AddComponent<FollowCamera>();
         follow.target = player.transform;
 
+        // Step 2 (additive): scatter collectibles through the dungeon.
+        GameObject loot = new GameObject("Collectibles");
+        loot.AddComponent<CollectiblePlacer>();
+
         if (GameObject.Find("Sun") == null)
         {
             GameObject sun = new GameObject("Sun");

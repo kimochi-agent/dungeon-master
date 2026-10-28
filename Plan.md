@@ -7,7 +7,7 @@
 Status tags: `[TODO]` -> `[IN PROGRESS]` -> `[IN REVIEW]` -> `[PASSED]`, or `[NEEDS FIX]` with `Fix:` notes. Only the verifier plus you mark `[PASSED]`. See `agents/README.md`.
 
 1. Initially the game would be having a player object and dungeon and the player could be able to move across dungeons. Basically dungeons would be explorable 3d map. [PASSED]
-2. We will add collectibles such as coins, power-ups, chests currently without lock. [TODO]
+2. We will add collectibles such as coins, power-ups, chests currently without lock. [PASSED]
 3. Chests would be having locks which would require a math riddle, puzzle or questions to be answered in order to unlock them. [TODO]
 4. Player health system with damage intake, death and respawn, plus a basic HUD showing health bar and coin count. [TODO]
 5. Touch controls for player movement so the game is playable on a mobile phone. [TODO]
