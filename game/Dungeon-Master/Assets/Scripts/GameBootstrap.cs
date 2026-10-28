@@ -19,6 +19,7 @@ public static class GameBootstrap
         Object.Destroy(player.GetComponent<CapsuleCollider>());
         player.AddComponent<CharacterController>();
         player.AddComponent<PlayerController>();
+        player.AddComponent<PlayerHealth>(); // Step 4 (additive).
         Renderer renderer = player.GetComponent<Renderer>();
         Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
         renderer.material = new Material(shader) { color = new Color(0.2f, 0.5f, 1f) };
@@ -39,6 +40,10 @@ public static class GameBootstrap
         // Step 2 (additive): scatter collectibles through the dungeon.
         GameObject loot = new GameObject("Collectibles");
         loot.AddComponent<CollectiblePlacer>();
+
+        // Step 4 (additive): health bar and counters.
+        GameObject hud = new GameObject("HUD");
+        hud.AddComponent<HUD>();
 
         if (GameObject.Find("Sun") == null)
         {

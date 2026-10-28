@@ -16,7 +16,7 @@ Status tags: `[TODO]` -> `[IN PROGRESS]` -> `[IN REVIEW]` -> `[PASSED]`, or `[NE
   - Fix: UnityEngine.EventSystems.StandaloneInputModule.ShouldActivateModule () (at ./Library/PackageCache/com.unity.ugui@eb824e41fbc7/Runtime/UGUI/EventSystem/InputModules/StandaloneInputModule.cs:252)
   - Fix: UnityEngine.EventSystems.EventSystem.Update () (at ./Library/PackageCache/com.unity.ugui@eb824e41fbc7/Runtime/UGUI/EventSystem/EventSystem.cs:500)
   - Fix: UnityEngine.StackTraceUtility:ExtractStringFromExceptionInternal(Object, String&, String&)
-4. Player health system with damage intake, death and respawn, plus a basic HUD showing health bar and coin count. [TODO]
+4. Player health system with damage intake, death and respawn, plus a basic HUD showing health bar and coin count. [PASSED]
 5. Touch controls for player movement so the game is playable on a mobile phone. [TODO]
 6. Game shell screens: main menu, pause, game over and restart flow. [TODO]
 7. Power-up pickup effects (e.g. speed boost, extra health, shield) applied when collected. [TODO]
