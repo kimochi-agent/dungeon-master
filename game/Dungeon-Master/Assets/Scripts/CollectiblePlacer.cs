@@ -2,6 +2,7 @@ using UnityEngine;
 
 // Step 2: builds collectible visuals from primitives and scatters them
 // through the dungeon. Runs from the bootstrap, alongside the generator.
+// Step 3: adds locked chests (gold lids) holding the math puzzle.
 public class CollectiblePlacer : MonoBehaviour
 {
     private void Awake()
@@ -26,6 +27,9 @@ public class CollectiblePlacer : MonoBehaviour
         // Unlocked chests.
         CreateChest(new Vector3(-8f, 0f, 8f));
         CreateChest(new Vector3(30f, 0f, 5f));
+        // Locked chests (step 3).
+        CreateChest(new Vector3(8f, 0f, -8f), true);
+        CreateChest(new Vector3(27f, 0f, -5f), true);
     }
 
     public static GameObject CreateCoin(Vector3 position)
@@ -52,10 +56,10 @@ public class CollectiblePlacer : MonoBehaviour
         return go;
     }
 
-    public static GameObject CreateChest(Vector3 position)
+    public static GameObject CreateChest(Vector3 position, bool locked = false)
     {
         GameObject root = Root();
-        GameObject chest = new GameObject("Chest");
+        GameObject chest = new GameObject(locked ? "LockedChest" : "Chest");
         chest.transform.SetParent(root.transform, false);
         chest.transform.position = position;
 
@@ -75,9 +79,10 @@ public class CollectiblePlacer : MonoBehaviour
         lid.transform.SetParent(pivot.transform, false);
         lid.transform.localPosition = new Vector3(0f, 0.125f, 0.4f);
         lid.transform.localScale = new Vector3(1.2f, 0.25f, 0.8f);
-        lid.GetComponent<Renderer>().material = MakeMaterial(new Color(0.35f, 0.22f, 0.1f));
+        Color lidColor = locked ? new Color(1f, 0.78f, 0.15f) : new Color(0.35f, 0.22f, 0.1f);
+        lid.GetComponent<Renderer>().material = MakeMaterial(lidColor);
 
-        chest.AddComponent<Chest>();
+        chest.AddComponent<Chest>().isLocked = locked;
         return chest;
     }
 

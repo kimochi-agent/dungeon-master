@@ -1,10 +1,12 @@
 using UnityEngine;
 
 // Step 2: unlocked chest. Walking up to it swings the lid open and pops out
-// coins. Locks arrive in step 3.
+// coins. Step 3: locked chests open the math puzzle instead.
 public class Chest : Collectible
 {
     [SerializeField] private int coinsInside = 5;
+
+    public bool isLocked = false;
 
     private bool opened;
     private Transform lidPivot;
@@ -18,7 +20,11 @@ public class Chest : Collectible
 
     protected override void Update()
     {
-        if (!opened && PlayerInRange())
+        if (opened || !PlayerInRange())
+            return;
+        if (isLocked)
+            PuzzleUI.Instance.Show(this);
+        else
             Open();
     }
 
@@ -30,6 +36,12 @@ public class Chest : Collectible
     protected override void Collect()
     {
         // Unused: chests open instead of being collected.
+    }
+
+    public void UnlockAndOpen()
+    {
+        isLocked = false;
+        Open();
     }
 
     private void Open()

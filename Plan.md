@@ -8,7 +8,14 @@ Status tags: `[TODO]` -> `[IN PROGRESS]` -> `[IN REVIEW]` -> `[PASSED]`, or `[NE
 
 1. Initially the game would be having a player object and dungeon and the player could be able to move across dungeons. Basically dungeons would be explorable 3d map. [PASSED]
 2. We will add collectibles such as coins, power-ups, chests currently without lock. [PASSED]
-3. Chests would be having locks which would require a math riddle, puzzle or questions to be answered in order to unlock them. [TODO]
+3. Chests would be having locks which would require a math riddle, puzzle or questions to be answered in order to unlock them. [PASSED]
+  - Fix: InvalidOperationException: You are trying to read Input using the UnityEngine.Input class, but you have switched active Input handling to Input System package in Player Settings.
+  - Fix: UnityEngine.Internal.InputUnsafeUtility.GetButtonDown (System.String buttonName) (at <d61856715e604432bd9c684f2340dc5b>:0)
+  - Fix: UnityEngine.Input.GetButtonDown (System.String buttonName) (at <d61856715e604432bd9c684f2340dc5b>:0)
+  - Fix: UnityEngine.EventSystems.BaseInput.GetButtonDown (System.String buttonName) (at ./Library/PackageCache/com.unity.ugui@eb824e41fbc7/Runtime/UGUI/EventSystem/InputModules/BaseInput.cs:154)
+  - Fix: UnityEngine.EventSystems.StandaloneInputModule.ShouldActivateModule () (at ./Library/PackageCache/com.unity.ugui@eb824e41fbc7/Runtime/UGUI/EventSystem/InputModules/StandaloneInputModule.cs:252)
+  - Fix: UnityEngine.EventSystems.EventSystem.Update () (at ./Library/PackageCache/com.unity.ugui@eb824e41fbc7/Runtime/UGUI/EventSystem/EventSystem.cs:500)
+  - Fix: UnityEngine.StackTraceUtility:ExtractStringFromExceptionInternal(Object, String&, String&)
 4. Player health system with damage intake, death and respawn, plus a basic HUD showing health bar and coin count. [TODO]
 5. Touch controls for player movement so the game is playable on a mobile phone. [TODO]
 6. Game shell screens: main menu, pause, game over and restart flow. [TODO]
