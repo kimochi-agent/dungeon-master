@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.EnhancedTouch;
+using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 

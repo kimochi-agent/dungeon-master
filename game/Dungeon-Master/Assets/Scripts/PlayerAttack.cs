@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.EnhancedTouch;
+using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.InputSystem;
 
 // Step 9: melee attack. Space / left-click / gamepad-A / right-half screen tap
