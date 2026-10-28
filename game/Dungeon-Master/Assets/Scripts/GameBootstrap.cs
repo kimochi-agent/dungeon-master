@@ -45,6 +45,21 @@ public static class GameBootstrap
         GameObject hud = new GameObject("HUD");
         hud.AddComponent<HUD>();
 
+        // Step 5 (additive): touch joystick (hidden unless a touchscreen exists).
+        GameObject stick = new GameObject("TouchJoystick");
+        stick.AddComponent<TouchJoystick>();
+
+        // Step 6 (additive): menu / pause / game-over shell.
+        GameObject shell = new GameObject("GameShell");
+        shell.AddComponent<GameShell>();
+
+        // Step 8 (additive): spawn monsters.
+        GameObject spawner = new GameObject("MonsterSpawner");
+        spawner.AddComponent<MonsterSpawner>();
+
+        // Step 9 (additive): melee attack.
+        player.AddComponent<PlayerAttack>();
+
         if (GameObject.Find("Sun") == null)
         {
             GameObject sun = new GameObject("Sun");

@@ -10,12 +10,32 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity = -20f;
     [SerializeField] private float turnSpeed = 12f;
 
+    public float speedMultiplier = 1f; // Step 7 (additive): speed power-up.
+
     private CharacterController controller;
     private float verticalVelocity;
+    private Coroutine speedBoostRoutine;
+
+    // Step 7 (additive): temporary speed boost. Re-pickup restarts the timer.
+    public void ApplySpeedBoost(float multiplier, float duration)
+    {
+        if (speedBoostRoutine != null)
+            StopCoroutine(speedBoostRoutine);
+        speedBoostRoutine = StartCoroutine(SpeedBoost(duration, multiplier));
+    }
+
+    private System.Collections.IEnumerator SpeedBoost(float duration, float multiplier)
+    {
+        speedMultiplier = multiplier;
+        yield return new WaitForSeconds(duration);
+        speedMultiplier = 1f;
+        speedBoostRoutine = null;
+    }
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+        moveSpeed = GameConfig.Current.playerMoveSpeed; // Step 10: config is source of truth.
     }
 
     private void Update()
@@ -36,7 +56,7 @@ public class PlayerController : MonoBehaviour
         else
             verticalVelocity += gravity * Time.deltaTime;
 
-        controller.Move((move * moveSpeed + Vector3.up * verticalVelocity) * Time.deltaTime);
+        controller.Move((move * moveSpeed * speedMultiplier + Vector3.up * verticalVelocity) * Time.deltaTime);
     }
 
     private static Vector2 ReadMoveInput()
@@ -59,6 +79,8 @@ public class PlayerController : MonoBehaviour
         var gamepad = Gamepad.current;
         if (gamepad != null)
             input += gamepad.leftStick.ReadValue();
+
+        input += TouchJoystick.Vector; // Step 5 (additive): touch joystick.
 
         return input;
     }
