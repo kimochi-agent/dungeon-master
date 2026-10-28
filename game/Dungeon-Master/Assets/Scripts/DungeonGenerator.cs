@@ -8,6 +8,7 @@ public class DungeonGenerator : MonoBehaviour
     [SerializeField] private float wallThickness = 1f;
 
     public Vector3 SpawnPoint = new Vector3(-6f, 1f, 0f);
+    public Vector3 HallCCenter { get; private set; } // Step 13 (additive).
 
     private Material floorMaterial;
     private Material wallMaterial;
@@ -39,17 +40,33 @@ public class DungeonGenerator : MonoBehaviour
         AddBox("FloorB", new Vector3(25f, -0.25f, 0f), new Vector3(14f, 0.5f, 14f), floorMaterial);
         AddWall(new Vector3(25f, 0f, 7f), 14f, false);   // north
         AddWall(new Vector3(25f, 0f, -7f), 14f, false);  // south
-        AddWall(new Vector3(32f, 0f, 0f), 14f, true);    // east
+        AddWallWithDoor(new Vector3(32f, 0f, 0f), 14f, true); // east with doorway (step 13)
+        AddGate(new Vector3(32f, 1.5f, 0f)); // Step 13 (additive): second locked gate.
         AddWallWithDoor(new Vector3(18f, 0f, 0f), 14f, true); // west with doorway
+        AddGate(new Vector3(18f, 1.5f, 0f)); // Step 11 (additive): locked gate.
 
         // Pillars for cover.
         AddBox("PillarA1", new Vector3(-5f, wallHeight / 2f, -5f), new Vector3(1f, wallHeight, 1f), wallMaterial);
         AddBox("PillarA2", new Vector3(-5f, wallHeight / 2f, 5f), new Vector3(1f, wallHeight, 1f), wallMaterial);
         AddBox("PillarB1", new Vector3(25f, wallHeight / 2f, 3f), new Vector3(1f, wallHeight, 1f), wallMaterial);
 
+        // Corridor 2: x from 32 to 40, 4 wide (step 13).
+        AddBox("FloorCorridor2", new Vector3(36f, -0.25f, 0f), new Vector3(8f, 0.5f, 4f), floorMaterial);
+        AddBox("WallCorridor2N", new Vector3(36f, wallHeight / 2f, 2.5f), new Vector3(8f, wallHeight, wallThickness), wallMaterial);
+        AddBox("WallCorridor2S", new Vector3(36f, wallHeight / 2f, -2.5f), new Vector3(8f, wallHeight, wallThickness), wallMaterial);
+
+        // Hall C: 12x12 centered on x=46, doorway on the west side (step 13).
+        AddBox("FloorC", new Vector3(46f, -0.25f, 0f), new Vector3(12f, 0.5f, 12f), floorMaterial);
+        AddWall(new Vector3(46f, 0f, 6f), 12f, false);
+        AddWall(new Vector3(46f, 0f, -6f), 12f, false);
+        AddWall(new Vector3(52f, 0f, 0f), 12f, true);
+        AddWallWithDoor(new Vector3(40f, 0f, 0f), 12f, true);
+        HallCCenter = new Vector3(46f, 1f, 0f);
+
         // Warm lights per hall.
         AddLight(new Vector3(0f, 2.5f, 0f));
         AddLight(new Vector3(25f, 2.5f, 0f));
+        AddLight(new Vector3(46f, 2.5f, 0f));
     }
 
     // Full wall of given length. If alongX, the wall runs north-south (faces east/west).
@@ -85,6 +102,18 @@ public class DungeonGenerator : MonoBehaviour
         go.transform.position = center;
         go.transform.localScale = size;
         go.GetComponent<Renderer>().material = material;
+    }
+
+    // Step 11 (additive): solid gate plugging a 4-wide doorway; sinks on unlock.
+    private void AddGate(Vector3 center)
+    {
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        go.name = "Gate";
+        go.transform.SetParent(transform, false);
+        go.transform.position = center;
+        go.transform.localScale = new Vector3(1f, 3f, 4f);
+        go.GetComponent<Renderer>().material = MakeMaterial(new Color(0.2f, 0.2f, 0.24f));
+        go.AddComponent<Gate>();
     }
 
     private void AddLight(Vector3 position)

@@ -27,17 +27,17 @@ public class PuzzleUI : MonoBehaviour
     private Text questionText;
     private Text feedbackText;
     private readonly Text[] optionLabels = new Text[3];
-    private Chest currentChest;
+    private IPuzzleLock currentLock;
     private MathPuzzle.Question current;
     private PlayerController playerController;
     private bool open;
 
-    public void Show(Chest chest)
+    public void Show(IPuzzleLock puzzleLock)
     {
         if (open)
             return;
         EnsureBuilt();
-        currentChest = chest;
+        currentLock = puzzleLock;
         current = MathPuzzle.Generate();
         questionText.text = current.text;
         for (int i = 0; i < 3; i++)
@@ -56,8 +56,8 @@ public class PuzzleUI : MonoBehaviour
             return;
         if (index == current.correctIndex)
         {
-            feedbackText.text = "Correct! The chest opens.";
-            currentChest.UnlockAndOpen();
+            feedbackText.text = "Correct! Unlocked.";
+            currentLock.UnlockAndOpen();
             StartCoroutine(CloseAfter(0.8f));
         }
         else
@@ -81,7 +81,7 @@ public class PuzzleUI : MonoBehaviour
         if (playerController != null)
             playerController.enabled = true;
         playerController = null;
-        currentChest = null;
+        currentLock = null;
     }
 
     private void EnsureBuilt()

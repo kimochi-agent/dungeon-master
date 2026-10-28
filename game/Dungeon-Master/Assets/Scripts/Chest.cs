@@ -2,11 +2,12 @@ using UnityEngine;
 
 // Step 2: unlocked chest. Walking up to it swings the lid open and pops out
 // coins. Step 3: locked chests open the math puzzle instead.
-public class Chest : Collectible
+public class Chest : Collectible, IPuzzleLock
 {
     [SerializeField] private int coinsInside = 5;
 
     public bool isLocked = false;
+    public Transform LockTransform => transform;
 
     private bool opened;
     private Transform lidPivot;
