@@ -198,6 +198,7 @@
   };
   var paused = false;
   var reviewStep = null;
+  var verdictKey = null;
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -341,16 +342,21 @@
     reviewStep = steps.filter(function (s) { return s.tag === "IN REVIEW"; })[0] || null;
     renderChanges(state.report || {});
     var vd = state.verdict || {};
-    if (!(vd.verdict && reviewStep && vd.step === reviewStep.n) && !(reviewStep)) {
-      if (vd.verdict) {
-        document.getElementById("verdictBody").innerHTML =
-          '<div class="recorded"><strong>Recorded: ' + esc(vd.verdict) +
-          " on step " + vd.step + "</strong>" + (vd.note ? "<br>" + esc(vd.note) : "") + "</div>";
+    var key = (reviewStep ? reviewStep.n + ":" + reviewStep.tag : "-") +
+      "|" + (vd.verdict ? vd.step + ":" + vd.verdict : "-");
+    if (key !== verdictKey) {
+      verdictKey = key;
+      if (!(vd.verdict && reviewStep && vd.step === reviewStep.n) && !(reviewStep)) {
+        if (vd.verdict) {
+          document.getElementById("verdictBody").innerHTML =
+            '<div class="recorded"><strong>Recorded: ' + esc(vd.verdict) +
+            " on step " + vd.step + "</strong>" + (vd.note ? "<br>" + esc(vd.note) : "") + "</div>";
+        } else {
+          renderVerdict(vd);
+        }
       } else {
         renderVerdict(vd);
       }
-    } else {
-      renderVerdict(vd);
     }
 
     var st = state.status || {};
