@@ -1,0 +1,34 @@
+# Unity generated files (project: game/Dungeon-Master)
+game/Dungeon-Master/[Ll]ibrary/
+game/Dungeon-Master/[Tt]emp/
+game/Dungeon-Master/[Oo]bj/
+game/Dungeon-Master/[Bb]uild/
+game/Dungeon-Master/[Bb]uilds/
+game/Dungeon-Master/[Ll]ogs/
+game/Dungeon-Master/[Uu]ser[Ss]ettings/
+game/Dungeon-Master/[Mm]emoryCaptures/
+game/Dungeon-Master/[Rr]ecordings/
+game/Dungeon-Master/.vs/
+*.csproj
+*.slnx
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+sysinfo.txt
+*.apk
+*.aab
+*.unitypackage
+
+# Agent runtime state (regenerated every run)
+agents/*.json
+
+# Python caches
+__pycache__/
+*.pyc

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dungeon Master — Build Dashboard</title>
+<style>
+  :root {
+    --bg: #eceff1;
+    --card: #ffffff;
+    --ink: #1c2530;
+    --muted: #5b6b7b;
+    --line: #d7dde3;
+    --accent: #0b6e4f;
+    --amber: #9a6700;
+    --red: #b3261e;
+    --blue: #0b5cad;
+    --gray: #67727e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  header {
+    background: #1c2530;
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 19px; margin: 0; font-weight: 650; }
+  header .sub { color: #b9c4cf; font-size: 13px; }
+  #conn { font-size: 13px; color: #b9c4cf; margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  #conn .dot { width: 10px; height: 10px; border-radius: 50%; background: #35c26e; display: inline-block; }
+  #conn.off .dot { background: #e5484d; }
+  #pauseBtn {
+    border: 1px solid #b9c4cf;
+    background: transparent;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  #pauseBtn:hover { background: rgba(255,255,255,.12); }
+  #pauseBtn.resume { background: #35c26e; border-color: #35c26e; color: #10231a; }
+  #pausedBanner {
+    display: none;
+    background: #fff4d6;
+    border-bottom: 2px solid var(--amber);
+    color: #5c4300;
+    padding: 10px 24px;
+    font-weight: 600;
+  }
+  main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px 24px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+  section h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; font-weight: 700; }
+  #progressWrap { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  #progressBar { flex: 1; height: 10px; background: #e2e7ec; border-radius: 5px; overflow: hidden; }
+  #progressFill { height: 100%; width: 0; background: var(--accent); }
+  #progressText { font-weight: 700; font-size: 14px; white-space: nowrap; }
+  .pill {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .TODO { background: var(--gray); }
+  .INPROGRESS { background: var(--blue); }
+  .INREVIEW { background: var(--amber); }
+  .PASSED { background: var(--accent); }
+  .NEEDSFIX { background: var(--red); }
+  #currentBody { font-size: 16px; }
+  #currentBody .stepnum { font-size: 28px; font-weight: 750; margin-right: 8px; }
+  .fix { color: var(--red); font-size: 14px; margin: 6px 0 0 40px; }
+  .agent { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; border-top: 1px solid var(--line); }
+  .agent:first-of-type { border-top: none; }
+  .agent .name { font-weight: 700; min-width: 74px; }
+  .agent .detail { color: var(--muted); font-size: 14px; }
+  #log { list-style: none; margin: 12px 0 0; padding: 0; max-height: 220px; overflow-y: auto; font-size: 13.5px; }
+  #log li { padding: 5px 0; border-top: 1px solid var(--line); }
+  #log time { color: var(--muted); margin-right: 8px; font-variant-numeric: tabular-nums; }
+  #log .who { font-weight: 700; margin-right: 6px; }
+  ol#plan { list-style: none; margin: 0; padding: 0; }
+  ol#plan li { padding: 8px 0; border-top: 1px solid var(--line); display: flex; gap: 10px; align-items: baseline; }
+  ol#plan li:first-child { border-top: none; }
+  ol#plan .n { font-weight: 750; min-width: 26px; }
+  ol#plan .t { flex: 1; }
+  #changesBody ul { margin: 8px 0; padding-left: 22px; }
+  #changesBody li { margin: 4px 0; }
+  #changesBody code { font-size: 13px; background: #eef1f4; padding: 1px 6px; border-radius: 4px; }
+  #changesBody .lbl { font-weight: 700; margin-top: 10px; }
+  #changesBody .vrec { background: #eef4ef; border: 1px solid #c4d8c7; border-radius: 6px; padding: 8px 12px; margin-top: 10px; font-size: 14px; }
+  #verdictBody textarea {
+    width: 100%;
+    min-height: 70px;
+    font: inherit;
+    font-size: 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin: 10px 0;
+    resize: vertical;
+  }
+  .vbtnrow { display: flex; gap: 10px; }
+  .vbtn {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 10px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid var(--accent);
+  }
+  #passBtn { background: var(--accent); color: #fff; }
+  #failBtn { background: #fff; color: var(--red); border-color: var(--red); }
+  .vbtn:disabled { opacity: .45; cursor: default; }
+  #verdictMsg { font-size: 14px; margin-top: 8px; min-height: 20px; }
+  #verdictMsg.err { color: var(--red); font-weight: 600; }
+  .recorded { background: #eef4ef; border: 1px solid #c4d8c7; border-radius: 6px; padding: 10px 12px; font-size: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Dungeon Master — Build Dashboard</h1>
+    <div class="sub">Live view of the plan, the agents, and the build switch</div>
+  </div>
+  <div id="conn"><span class="dot"></span><span id="connText">connecting…</span></div>
+  <button id="pauseBtn" type="button">Pause</button>
+</header>
+<div id="pausedBanner">Build is paused — agents will stop before starting new work.</div>
+<main>
+  <div>
+    <section>
+      <h2>Progress</h2>
+      <div id="progressWrap">
+        <div id="progressBar"><div id="progressFill"></div></div>
+        <div id="progressText">–</div>
+      </div>
+    </section>
+    <section>
+      <h2>Current step</h2>
+      <div id="currentBody">Loading…</div>
+    </section>
+    <section>
+      <h2>Step changes</h2>
+      <div id="changesBody">Loading…</div>
+    </section>
+    <section>
+      <h2>Your verdict</h2>
+      <div id="verdictBody">Loading…</div>
+    </section>
+    <section>
+      <h2>Agents</h2>
+      <div id="agents"><div class="agent"><span class="name">…</span></div></div>
+      <h2 style="margin-top:14px">Activity</h2>
+      <ul id="log"><li>No activity yet.</li></ul>
+    </section>
+  </div>
+  <div>
+    <section>
+      <h2>Remaining plan</h2>
+      <ol id="plan"><li>Loading…</li></ol>
+    </section>
+  </div>
+</main>
+<script>
+(function () {
+  var TAG_CLASS = {
+    "TODO": "TODO", "IN PROGRESS": "INPROGRESS", "IN REVIEW": "INREVIEW",
+    "PASSED": "PASSED", "NEEDS FIX": "NEEDSFIX"
+  };
+  var paused = false;
+  var reviewStep = null;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c];
+    });
+  }
+
+  function parsePlan(text) {
+    var steps = [], current = null;
+    text.split("\n").forEach(function (line) {
+      var m = line.match(/^(\d+)\.\s+(.*?)\s*\[(TODO|IN PROGRESS|IN REVIEW|PASSED|NEEDS FIX)\]\s*$/);
+      if (m) {
+        current = { n: +m[1], text: m[2], tag: m[3], fixes: [] };
+        steps.push(current);
+        return;
+      }
+      var f = line.match(/^\s*[-*]\s+(Fix:.*)$/);
+      if (f && current) current.fixes.push(f[1]);
+    });
+    return steps;
+  }
+
+  function fmtTime(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    return isNaN(d) ? "" : d.toLocaleTimeString();
+  }
+
+  function bulletList(items) {
+    if (!items || !items.length) return "";
+    return "<ul>" + items.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>";
+  }
+
+  function renderChanges(report) {
+    var box = document.getElementById("changesBody");
+    if (!report || !report.step) {
+      box.innerHTML = "No step has been built for review yet.";
+      return;
+    }
+    var html = "<div><strong>Step " + report.step + "</strong> ";
+    if (report.tag) html += '<span class="pill ' + (TAG_CLASS[report.tag] || "TODO") + '">' + esc(report.tag) + "</span>";
+    html += "</div>";
+    html += bulletList(report.built);
+    if (report.files && report.files.length) {
+      html += '<div class="lbl">Files</div><ul>' +
+        report.files.map(function (f) { return "<li><code>" + esc(f) + "</code></li>"; }).join("") + "</ul>";
+    }
+    if (report.tested) html += '<div class="lbl">Tested</div><div>' + esc(report.tested) + "</div>";
+    if (report.manual && report.manual.length) html += '<div class="lbl">Manual steps</div>' + bulletList(report.manual);
+    if (report.limitations && report.limitations.length) html += '<div class="lbl">Limitations</div>' + bulletList(report.limitations);
+    var v = report.verifier || {};
+    if (v.recommendation) {
+      html += '<div class="vrec"><strong>Verifier recommends: ' + esc(v.recommendation) + "</strong>" +
+        bulletList(v.findings) + "</div>";
+    }
+    box.innerHTML = html;
+  }
+
+  function renderVerdict(verdict) {
+    var box = document.getElementById("verdictBody");
+    var v = verdict || {};
+    if (v.verdict && reviewStep && v.step === reviewStep.n) {
+      box.innerHTML = '<div class="recorded"><strong>Recorded: ' + esc(v.verdict) +
+        " on step " + v.step + "</strong>" + (v.note ? "<br>" + esc(v.note) : "") +
+        "<br>The agent will pick this up and continue the loop.</div>";
+      return;
+    }
+    if (!reviewStep) {
+      box.innerHTML = "No step is waiting for review right now.";
+      return;
+    }
+    box.innerHTML =
+      "<div>Step " + reviewStep.n + " is ready. Playtest it, then pass your verdict — " +
+      "the agent continues from here, no need to go back to chat.</div>" +
+      '<textarea id="verdictNote" placeholder="What is wrong? (required for FAIL — becomes Fix: notes in the plan)"></textarea>' +
+      '<div class="vbtnrow"><button id="passBtn" class="vbtn" type="button">PASS</button>' +
+      '<button id="failBtn" class="vbtn" type="button">FAIL</button></div>' +
+      '<div id="verdictMsg"></div>';
+    document.getElementById("passBtn").addEventListener("click", function () { sendVerdict("PASS"); });
+    document.getElementById("failBtn").addEventListener("click", function () { sendVerdict("FAIL"); });
+  }
+
+  function sendVerdict(which) {
+    var noteEl = document.getElementById("verdictNote");
+    var msg = document.getElementById("verdictMsg");
+    var note = noteEl ? noteEl.value : "";
+    if (which === "FAIL" && !note.trim()) {
+      msg.className = "err";
+      msg.textContent = "Describe the problem first — it becomes the builder's Fix: notes.";
+      return;
+    }
+    msg.className = "";
+    msg.textContent = "Recording…";
+    fetch("/api/verdict", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({verdict: which, note: note})
+    }).then(function (r) {
+      return r.json().then(function (data) { return {ok: r.ok, data: data}; });
+    }).then(function (res) {
+      if (!res.ok) throw new Error((res.data && res.data.error) || "request failed");
+      poll();
+    }).catch(function (err) {
+      msg.className = "err";
+      msg.textContent = "Could not record verdict: " + err.message;
+    });
+  }
+
+  function render(state) {
+    var steps = parsePlan(state.plan || "");
+    var done = steps.filter(function (s) { return s.tag === "PASSED"; }).length;
+
+    document.getElementById("progressFill").style.width =
+      (steps.length ? Math.round(done / steps.length * 100) : 0) + "%";
+    document.getElementById("progressText").textContent =
+      steps.length ? done + " / " + steps.length + " passed" : "no steps found";
+
+    var active = steps.filter(function (s) { return s.tag !== "PASSED"; })[0];
+    var cur = document.getElementById("currentBody");
+    if (!active) {
+      cur.innerHTML = "<strong>All steps passed.</strong> The game is built.";
+    } else {
+      var html = '<span class="stepnum">' + active.n + '</span> ' +
+        '<span class="pill ' + TAG_CLASS[active.tag] + '">' + esc(active.tag) + "</span>" +
+        "<p>" + esc(active.text) + "</p>";
+      active.fixes.forEach(function (fx) { html += '<div class="fix">' + esc(fx) + "</div>"; });
+      cur.innerHTML = html;
+    }
+
+    var remaining = steps.filter(function (s) { return s.tag !== "PASSED"; });
+    var plan = document.getElementById("plan");
+    plan.innerHTML = remaining.length ? "" : "<li>Nothing remaining.</li>";
+    remaining.forEach(function (s) {
+      var li = document.createElement("li");
+      li.innerHTML = '<span class="n">' + s.n + ".</span> " +
+        '<span class="t">' + esc(s.text) + "</span> " +
+        '<span class="pill ' + TAG_CLASS[s.tag] + '">' + esc(s.tag) + "</span>";
+      plan.appendChild(li);
+    });
+
+    reviewStep = steps.filter(function (s) { return s.tag === "IN REVIEW"; })[0] || null;
+    renderChanges(state.report || {});
+    var vd = state.verdict || {};
+    if (!(vd.verdict && reviewStep && vd.step === reviewStep.n) && !(reviewStep)) {
+      if (vd.verdict) {
+        document.getElementById("verdictBody").innerHTML =
+          '<div class="recorded"><strong>Recorded: ' + esc(vd.verdict) +
+          " on step " + vd.step + "</strong>" + (vd.note ? "<br>" + esc(vd.note) : "") + "</div>";
+      } else {
+        renderVerdict(vd);
+      }
+    } else {
+      renderVerdict(vd);
+    }
+
+    var st = state.status || {};
+    var agents = document.getElementById("agents");
+    agents.innerHTML = "";
+    [["Builder", st.builder], ["Verifier", st.verifier]].forEach(function (pair) {
+      var info = pair[1] || {};
+      var div = document.createElement("div");
+      div.className = "agent";
+      var label = info.state || "idle";
+      if (info.step) label += " · step " + info.step;
+      div.innerHTML = '<span class="name">' + pair[0] + "</span> " +
+        "<span><strong>" + esc(label) + "</strong><br>" +
+        '<span class="detail">' + esc(info.detail || "") + "</span></span>";
+      agents.appendChild(div);
+    });
+
+    var log = document.getElementById("log");
+    var entries = (st.log || []).slice(-12).reverse();
+    log.innerHTML = entries.length ? "" : "<li>No activity yet.</li>";
+    entries.forEach(function (e) {
+      var li = document.createElement("li");
+      li.innerHTML = "<time>" + esc(fmtTime(e.time)) + "</time>" +
+        '<span class="who">' + esc(e.agent) + "</span>" + esc(e.message);
+      log.appendChild(li);
+    });
+
+    paused = !!(state.control && state.control.paused);
+    document.getElementById("pausedBanner").style.display = paused ? "block" : "none";
+    var btn = document.getElementById("pauseBtn");
+    btn.textContent = paused ? "Resume" : "Pause";
+    btn.className = paused ? "resume" : "";
+  }
+
+  function poll() {
+    fetch("/api/state", {cache: "no-store"}).then(function (r) {
+      if (!r.ok) throw new Error("http " + r.status);
+      return r.json();
+    }).then(function (state) {
+      render(state);
+      document.getElementById("conn").className = "";
+      document.getElementById("connText").textContent =
+        "live · updated " + new Date().toLocaleTimeString();
+    }).catch(function () {
+      document.getElementById("conn").className = "off";
+      document.getElementById("connText").textContent = "server unreachable";
+    });
+  }
+
+  document.getElementById("pauseBtn").addEventListener("click", function () {
+    var btn = this;
+    btn.disabled = true;
+    fetch(paused ? "/api/resume" : "/api/pause", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: "{}"
+    }).then(function () { poll(); }).catch(function () { poll(); })
+      .finally(function () { btn.disabled = false; });
+  });
+
+  poll();
+  setInterval(poll, 2000);
+})();
+</script>
+</body>
+</html>
