@@ -21,8 +21,7 @@ public static class GameBootstrap
         player.AddComponent<PlayerController>();
         player.AddComponent<PlayerHealth>(); // Step 4 (additive).
         Renderer renderer = player.GetComponent<Renderer>();
-        Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-        renderer.material = new Material(shader) { color = new Color(0.2f, 0.5f, 1f) };
+        renderer.sharedMaterial = SharedMaterials.Tinted(renderer, new Color(0.2f, 0.5f, 1f));
 
         Camera camera = Camera.main;
         if (camera == null)

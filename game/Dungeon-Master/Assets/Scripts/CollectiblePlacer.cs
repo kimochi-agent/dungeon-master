@@ -93,7 +93,8 @@ public class CollectiblePlacer : MonoBehaviour
         body.transform.SetParent(chest.transform, false);
         body.transform.localPosition = new Vector3(0f, 0.35f, 0f);
         body.transform.localScale = new Vector3(1.2f, 0.7f, 0.8f);
-        body.GetComponent<Renderer>().material = MakeMaterial(new Color(0.5f, 0.32f, 0.15f));
+        Renderer bodyRenderer = body.GetComponent<Renderer>();
+        bodyRenderer.sharedMaterial = SharedMaterials.Tinted(bodyRenderer, new Color(0.5f, 0.32f, 0.15f));
 
         GameObject pivot = new GameObject("LidPivot");
         pivot.transform.SetParent(chest.transform, false);
@@ -105,7 +106,8 @@ public class CollectiblePlacer : MonoBehaviour
         lid.transform.localPosition = new Vector3(0f, 0.125f, 0.4f);
         lid.transform.localScale = new Vector3(1.2f, 0.25f, 0.8f);
         Color lidColor = locked ? new Color(1f, 0.78f, 0.15f) : new Color(0.35f, 0.22f, 0.1f);
-        lid.GetComponent<Renderer>().material = MakeMaterial(lidColor);
+        Renderer lidRenderer = lid.GetComponent<Renderer>();
+        lidRenderer.sharedMaterial = SharedMaterials.Tinted(lidRenderer, lidColor);
 
         chest.AddComponent<Chest>().isLocked = locked;
         return chest;
@@ -116,7 +118,8 @@ public class CollectiblePlacer : MonoBehaviour
         GameObject mesh = GameObject.CreatePrimitive(type);
         mesh.transform.SetParent(go.transform, false);
         mesh.transform.localScale = scale;
-        mesh.GetComponent<Renderer>().material = MakeMaterial(color);
+        Renderer renderer = mesh.GetComponent<Renderer>();
+        renderer.sharedMaterial = SharedMaterials.Tinted(renderer, color);
         go.transform.SetParent(Root().transform, false);
         return go;
     }
@@ -127,13 +130,5 @@ public class CollectiblePlacer : MonoBehaviour
         if (root == null)
             root = new GameObject("Collectibles");
         return root;
-    }
-
-    private static Material MakeMaterial(Color color)
-    {
-        Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-        Material material = new Material(shader);
-        material.color = color;
-        return material;
     }
 }

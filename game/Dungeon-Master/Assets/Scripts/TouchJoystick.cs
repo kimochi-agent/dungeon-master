@@ -1,23 +1,13 @@
 using UnityEngine;
-using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using InputTouchPhase = UnityEngine.InputSystem.TouchPhase;
 
-// Step 5: fixed virtual joystick, bottom-left. Touch only: hidden unless a
-// touchscreen exists. PlayerController adds Vector to keyboard/gamepad input.
+// Step 5: fixed virtual joystick, bottom-left. Polls the touchscreen control
+// directly (no EnhancedTouch dependency). Hidden unless a touchscreen exists.
 public class TouchJoystick : MonoBehaviour
 {
     public static Vector2 Vector { get; private set; }
-
-    private static bool touchEnabled;
-
-    public static void EnableTouch()
-    {
-        if (touchEnabled)
-            return;
-        touchEnabled = true;
-        EnhancedTouchSupport.Enable();
-    }
 
     [SerializeField] private float radius = 90f;
 
@@ -29,7 +19,6 @@ public class TouchJoystick : MonoBehaviour
 
     private void Awake()
     {
-        EnableTouch();
         Build();
     }
 
@@ -41,7 +30,8 @@ public class TouchJoystick : MonoBehaviour
 
     private void Update()
     {
-        if (Touchscreen.current == null)
+        var screen = Touchscreen.current;
+        if (screen == null)
         {
             root.SetActive(false);
             Vector = Vector2.zero;
@@ -51,28 +41,31 @@ public class TouchJoystick : MonoBehaviour
         root.SetActive(true);
 
         bool found = false;
-        foreach (var touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+        foreach (var touch in screen.touches)
         {
-            if (touch.touchId == activeTouchId)
+            int id = touch.touchId.ReadValue();
+            InputTouchPhase phase = touch.phase.ReadValue();
+            if (id == activeTouchId)
             {
                 found = true;
-                if (touch.phase == UnityEngine.InputSystem.TouchPhase.Ended || touch.phase == UnityEngine.InputSystem.TouchPhase.Canceled)
+                if (phase == InputTouchPhase.Ended || phase == InputTouchPhase.Canceled ||
+                    phase == InputTouchPhase.None)
                 {
                     Release();
                 }
                 else
                 {
-                    Vector2 delta = touch.screenPosition - baseScreenPos;
+                    Vector2 delta = touch.position.ReadValue() - baseScreenPos;
                     if (delta.magnitude > radius)
                         delta = delta.normalized * radius;
                     Vector = delta / radius;
                     knob.anchoredPosition = delta / canvas.scaleFactor;
                 }
             }
-            else if (activeTouchId == -1 && touch.phase == UnityEngine.InputSystem.TouchPhase.Began &&
-                     Vector2.Distance(touch.screenPosition, baseScreenPos) < radius * 1.6f)
+            else if (activeTouchId == -1 && phase == InputTouchPhase.Began &&
+                     Vector2.Distance(touch.position.ReadValue(), baseScreenPos) < radius * 1.6f)
             {
-                activeTouchId = touch.touchId;
+                activeTouchId = id;
                 found = true;
             }
         }

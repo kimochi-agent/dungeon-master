@@ -25,8 +25,8 @@ public class MonsterSpawner : MonoBehaviour
         go.transform.position = position;
         go.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
         Object.Destroy(go.GetComponent<CapsuleCollider>());
-        Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-        go.GetComponent<Renderer>().material = new Material(shader) { color = new Color(0.8f, 0.15f, 0.15f) };
+        Renderer monsterRenderer = go.GetComponent<Renderer>();
+        monsterRenderer.sharedMaterial = SharedMaterials.Tinted(monsterRenderer, new Color(0.8f, 0.15f, 0.15f));
         go.AddComponent<CharacterController>();
         go.AddComponent<Monster>();
     }

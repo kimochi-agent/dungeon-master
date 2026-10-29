@@ -1,9 +1,9 @@
 using UnityEngine;
-using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.InputSystem;
+using InputTouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 // Step 9: melee attack. Space / left-click / gamepad-A / right-half screen tap
-// hits monsters within range. Touch attack shares the step-5 touch system.
+// hits monsters within range. Touch taps poll the touchscreen directly.
 public class PlayerAttack : MonoBehaviour
 {
     [SerializeField] private float range = 2.5f;
@@ -11,11 +11,6 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float cooldown = 0.4f;
 
     private float cooldownTimer;
-
-    private void Awake()
-    {
-        TouchJoystick.EnableTouch();
-    }
 
     private void Update()
     {
@@ -40,11 +35,13 @@ public class PlayerAttack : MonoBehaviour
         var gamepad = Gamepad.current;
         if (gamepad != null && gamepad.buttonSouth.wasPressedThisFrame)
             return true;
-        if (Touchscreen.current != null)
+        var screen = Touchscreen.current;
+        if (screen != null)
         {
-            foreach (var touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
+            foreach (var touch in screen.touches)
             {
-                if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began && touch.screenPosition.x > Screen.width / 2f)
+                if (touch.phase.ReadValue() == InputTouchPhase.Began &&
+                    touch.position.ReadValue().x > Screen.width / 2f)
                     return true;
             }
         }
