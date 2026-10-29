@@ -159,7 +159,7 @@ public class GameShell : MonoBehaviour
         MakeText(menuPanel.transform, "DUNGEON MASTER", 40, new Vector2(0f, 70f), new Vector2(440f, 60f), font);
         MakeText(menuPanel.transform, "Explore. Loot. Solve.", 22, new Vector2(0f, 10f), new Vector2(440f, 36f), font);
         MakeButton(menuPanel.transform, "Start", new Vector2(0f, -80f), font, StartGame);
-        MakeText(menuPanel.transform, "Left stick: look | Right pad: move | Center: attack", 16, new Vector2(0f, -128f), new Vector2(440f, 30f), font);
+        MakeText(menuPanel.transform, "Left pad: move + attack | Right stick: look", 16, new Vector2(0f, -128f), new Vector2(440f, 30f), font);
 
         pausePanel = Panel(canvasGo.transform, "Pause", new Vector2(400f, 300f));
         MakeText(pausePanel.transform, "Paused", 34, new Vector2(0f, 80f), new Vector2(360f, 50f), font);

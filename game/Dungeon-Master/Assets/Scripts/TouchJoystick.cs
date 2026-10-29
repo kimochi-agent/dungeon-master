@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-// Step 5: fixed circular look stick, bottom-left. Polls the touchscreen
+// Step 5: fixed circular look stick, bottom-right. Polls the touchscreen
 // control directly (no EnhancedTouch dependency). Hidden unless a touchscreen
 // exists. Hit zones are measured from live on-screen rects every frame, so
 // they always match the visuals. Drives the camera (look).
@@ -99,10 +99,10 @@ public class TouchJoystick : MonoBehaviour
         GameObject baseGo = new GameObject("Base");
         baseGo.transform.SetParent(canvasGo.transform, false);
         baseRt = baseGo.AddComponent<RectTransform>();
-        baseRt.anchorMin = baseRt.anchorMax = new Vector2(0f, 0f);
+        baseRt.anchorMin = baseRt.anchorMax = new Vector2(1f, 0f);
         baseRt.pivot = new Vector2(0.5f, 0.5f);
         baseRt.sizeDelta = new Vector2(130f, 130f);
-        baseRt.anchoredPosition = new Vector2(95f, 105f);
+        baseRt.anchoredPosition = new Vector2(-95f, 105f);
         Image baseImage = baseGo.AddComponent<Image>();
         baseImage.sprite = CircleSprite.Get();
         baseImage.color = new Color(0.08f, 0.08f, 0.1f, 0.55f);

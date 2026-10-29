@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-// Right-side button cluster: 4 triangle direction buttons for movement
+// Left-side button cluster: 4 triangle direction buttons for movement
 // around a circular attack button. Touch only; hidden without a touchscreen.
 // Hit zones are measured from live on-screen rects every frame.
 public class TouchButtons : MonoBehaviour
@@ -133,16 +133,16 @@ public class TouchButtons : MonoBehaviour
         canvas.sortingOrder = 20;
         canvasGo.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 
-        Vector2 center = new Vector2(-115f, 120f);
+        Vector2 center = new Vector2(115f, 120f);
         MakeButton(canvasGo.transform, attack, center, 32f, CircleSprite.Get(), 0f,
             new Color(0.85f, 0.2f, 0.2f, 0.75f));
-        MakeButton(canvasGo.transform, up, center + new Vector2(0f, 60f), 54f, TriangleSprite.Get(), 0f,
+        MakeButton(canvasGo.transform, up, center + new Vector2(0f, 40f), 40f, TriangleSprite.Get(), 0f,
             new Color(0.85f, 0.85f, 0.88f, 0.55f));
-        MakeButton(canvasGo.transform, down, center + new Vector2(0f, -60f), 54f, TriangleSprite.Get(), 180f,
+        MakeButton(canvasGo.transform, down, center + new Vector2(0f, -40f), 40f, TriangleSprite.Get(), 180f,
             new Color(0.85f, 0.85f, 0.88f, 0.55f));
-        MakeButton(canvasGo.transform, left, center + new Vector2(-60f, 0f), 54f, TriangleSprite.Get(), 90f,
+        MakeButton(canvasGo.transform, left, center + new Vector2(-40f, 0f), 40f, TriangleSprite.Get(), 90f,
             new Color(0.85f, 0.85f, 0.88f, 0.55f));
-        MakeButton(canvasGo.transform, right, center + new Vector2(60f, 0f), 54f, TriangleSprite.Get(), -90f,
+        MakeButton(canvasGo.transform, right, center + new Vector2(40f, 0f), 40f, TriangleSprite.Get(), -90f,
             new Color(0.85f, 0.85f, 0.88f, 0.55f));
     }
 
@@ -151,7 +151,7 @@ public class TouchButtons : MonoBehaviour
         GameObject go = new GameObject("PadButton");
         go.transform.SetParent(parent, false);
         RectTransform rt = go.AddComponent<RectTransform>();
-        rt.anchorMin = rt.anchorMax = new Vector2(1f, 0f);
+        rt.anchorMin = rt.anchorMax = new Vector2(0f, 0f);
         rt.pivot = new Vector2(0.5f, 0.5f);
         rt.sizeDelta = new Vector2(size, size);
         rt.anchoredPosition = offset;
