@@ -37,7 +37,7 @@ public class FirstPersonLook : MonoBehaviour
 
         Vector2 stick = TouchJoystick.Vector;
         if (stick.sqrMagnitude > 0.0001f)
-            ApplyLook(stick.x * stickYawRate * Time.deltaTime, stick.y * stickPitchRate * Time.deltaTime);
+            ApplyLook(stick.x * stickYawRate * Time.deltaTime, -stick.y * stickPitchRate * Time.deltaTime);
     }
 
     private void ApplyLook(float yawDelta, float pitchDelta)

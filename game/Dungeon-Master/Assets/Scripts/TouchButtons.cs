@@ -134,15 +134,15 @@ public class TouchButtons : MonoBehaviour
         canvasGo.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 
         Vector2 center = new Vector2(-115f, 120f);
-        MakeButton(canvasGo.transform, attack, center, 68f, CircleSprite.Get(), 0f,
+        MakeButton(canvasGo.transform, attack, center, 32f, CircleSprite.Get(), 0f,
             new Color(0.85f, 0.2f, 0.2f, 0.75f));
-        MakeButton(canvasGo.transform, up, center + new Vector2(0f, 75f), 54f, TriangleSprite.Get(), 0f,
+        MakeButton(canvasGo.transform, up, center + new Vector2(0f, 60f), 54f, TriangleSprite.Get(), 0f,
             new Color(0.85f, 0.85f, 0.88f, 0.55f));
-        MakeButton(canvasGo.transform, down, center + new Vector2(0f, -75f), 54f, TriangleSprite.Get(), 180f,
+        MakeButton(canvasGo.transform, down, center + new Vector2(0f, -60f), 54f, TriangleSprite.Get(), 180f,
             new Color(0.85f, 0.85f, 0.88f, 0.55f));
-        MakeButton(canvasGo.transform, left, center + new Vector2(-75f, 0f), 54f, TriangleSprite.Get(), 90f,
+        MakeButton(canvasGo.transform, left, center + new Vector2(-60f, 0f), 54f, TriangleSprite.Get(), 90f,
             new Color(0.85f, 0.85f, 0.88f, 0.55f));
-        MakeButton(canvasGo.transform, right, center + new Vector2(75f, 0f), 54f, TriangleSprite.Get(), -90f,
+        MakeButton(canvasGo.transform, right, center + new Vector2(60f, 0f), 54f, TriangleSprite.Get(), -90f,
             new Color(0.85f, 0.85f, 0.88f, 0.55f));
     }
 

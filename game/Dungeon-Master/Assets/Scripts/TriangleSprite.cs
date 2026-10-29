@@ -6,7 +6,7 @@ public static class TriangleSprite
 {
     private static Sprite cached;
 
-    public static Sprite Get(int size = 128)
+    public static Sprite Get(int size = 32)
     {
         if (cached != null)
             return cached;
@@ -25,7 +25,7 @@ public static class TriangleSprite
                 float alpha = 0f;
                 if (py >= baseY && py <= apexY)
                 {
-                    float halfWidth = (py - baseY) / (apexY - baseY) * halfBase;
+                    float halfWidth = (apexY - py) / (apexY - baseY) * halfBase;
                     alpha = Mathf.Clamp01((halfWidth - Mathf.Abs(px - cx)) / 2f);
                 }
                 tex.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
