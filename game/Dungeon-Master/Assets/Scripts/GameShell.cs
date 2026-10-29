@@ -17,7 +17,9 @@ public class GameShell : MonoBehaviour
     private GameObject menuPanel;
     private GameObject pausePanel;
     private GameObject overPanel;
+    private Text overTitle;
     private Text overText;
+    private static bool autoStart; // Play Again: skip the home screen after reload.
     private bool won; // Step 13 (additive).
     private DungeonGenerator dungeon; // Step 13 (additive).
     private Transform player; // Step 13 (additive).
@@ -32,6 +34,11 @@ public class GameShell : MonoBehaviour
         if (controller != null)
             player = controller.transform;
         ShowMenu();
+        if (autoStart)
+        {
+            autoStart = false;
+            StartGame();
+        }
     }
 
     private void Update()
@@ -51,7 +58,7 @@ public class GameShell : MonoBehaviour
             Vector3.Distance(player.position, dungeon.HallCCenter) < 5f)
         {
             won = true;
-            ShowGameOver($"You cleared the dungeon!\nCoins: {GameState.Coins}  Kills: {GameState.Kills}");
+            ShowGameOver("Victory!", $"You cleared the dungeon!\nCoins: {GameState.Coins}  Kills: {GameState.Kills}");
         }
     }
 
@@ -83,15 +90,32 @@ public class GameShell : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked; // First-person: capture mouse.
     }
 
+    // Play Again: reload straight back into the run.
     public void Restart()
     {
         Time.timeScale = 1f;
+        autoStart = true;
+        GameState.Reset();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    // Home: reload and land on the home screen.
+    public void GoHome()
+    {
+        Time.timeScale = 1f;
+        autoStart = false;
         GameState.Reset();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void ShowGameOver(string message)
     {
+        ShowGameOver("Run Over", message);
+    }
+
+    public void ShowGameOver(string title, string message)
+    {
+        overTitle.text = title;
         overText.text = message;
         pausePanel.SetActive(false);
         overPanel.SetActive(true);
@@ -135,15 +159,18 @@ public class GameShell : MonoBehaviour
         MakeText(menuPanel.transform, "DUNGEON MASTER", 40, new Vector2(0f, 70f), new Vector2(440f, 60f), font);
         MakeText(menuPanel.transform, "Explore. Loot. Solve.", 22, new Vector2(0f, 10f), new Vector2(440f, 36f), font);
         MakeButton(menuPanel.transform, "Start", new Vector2(0f, -80f), font, StartGame);
+        MakeText(menuPanel.transform, "Left stick: look | Right pad: move | Center: attack", 16, new Vector2(0f, -128f), new Vector2(440f, 30f), font);
 
         pausePanel = Panel(canvasGo.transform, "Pause", new Vector2(400f, 300f));
         MakeText(pausePanel.transform, "Paused", 34, new Vector2(0f, 80f), new Vector2(360f, 50f), font);
         MakeButton(pausePanel.transform, "Resume", new Vector2(0f, -10f), font, Resume);
         MakeButton(pausePanel.transform, "Restart", new Vector2(0f, -80f), font, Restart);
 
-        overPanel = Panel(canvasGo.transform, "GameOver", new Vector2(480f, 300f));
-        overText = MakeText(overPanel.transform, "", 32, new Vector2(0f, 60f), new Vector2(440f, 100f), font);
-        MakeButton(overPanel.transform, "Restart", new Vector2(0f, -80f), font, Restart);
+        overPanel = Panel(canvasGo.transform, "GameOver", new Vector2(480f, 320f));
+        overTitle = MakeText(overPanel.transform, "", 38, new Vector2(0f, 105f), new Vector2(440f, 50f), font);
+        overText = MakeText(overPanel.transform, "", 24, new Vector2(0f, 45f), new Vector2(440f, 70f), font);
+        MakeButton(overPanel.transform, "Play Again", new Vector2(0f, -45f), font, Restart);
+        MakeButton(overPanel.transform, "Home", new Vector2(0f, -112f), font, GoHome);
 
         // Small pause button, bottom-right, always visible during play.
         Button pauseButton = MakeButton(canvasGo.transform, "II", new Vector2(-16f, -16f), font, Pause);

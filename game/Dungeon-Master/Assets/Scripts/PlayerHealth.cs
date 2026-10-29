@@ -1,9 +1,8 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Step 4: player health, damage, death and respawn.
-// Monsters (step 8) will call TakeDamage; H key is a dev-only stand-in.
+// Step 4: player health, damage and death. Death ends the run and shows the
+// end screen (Home / Play Again). Monsters (step 8) call TakeDamage.
 public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] private int maxHealth = 100;
@@ -47,7 +46,12 @@ public class PlayerHealth : MonoBehaviour
         GameState.AddDamageTaken(amount); // Step 12 (additive): feed contextual puzzles.
         Debug.Log($"Player took {amount} damage. Health: {CurrentHealth}/{maxHealth}");
         if (CurrentHealth <= 0)
-            StartCoroutine(DieAndRespawn());
+        {
+            IsDead = true;
+            if (GameShell.Instance != null)
+                GameShell.Instance.ShowGameOver("Game Over",
+                    $"You died in the dungeon.\nCoins: {GameState.Coins}  Kills: {GameState.Kills}");
+        }
     }
 
     public void Heal(int amount)
@@ -57,21 +61,4 @@ public class PlayerHealth : MonoBehaviour
         CurrentHealth = Mathf.Min(maxHealth, CurrentHealth + amount);
     }
 
-    private IEnumerator DieAndRespawn()
-    {
-        IsDead = true;
-        Debug.Log("Player died. Respawning...");
-        yield return new WaitForSeconds(1f);
-        var dungeon = FindFirstObjectByType<DungeonGenerator>();
-        var controller = GetComponent<CharacterController>();
-        if (controller != null)
-            controller.enabled = false;
-        transform.position = dungeon != null ? dungeon.SpawnPoint : Vector3.up;
-        transform.rotation = Quaternion.identity;
-        if (controller != null)
-            controller.enabled = true;
-        CurrentHealth = maxHealth;
-        IsDead = false;
-        Debug.Log("Player respawned with full health.");
-    }
 }
