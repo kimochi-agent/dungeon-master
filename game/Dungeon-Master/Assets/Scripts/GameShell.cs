@@ -146,10 +146,10 @@ public class GameShell : MonoBehaviour
         MakeButton(overPanel.transform, "Restart", new Vector2(0f, -80f), font, Restart);
 
         // Small pause button, bottom-right, always visible during play.
-        Button pauseButton = MakeButton(canvasGo.transform, "II", new Vector2(-40f, 40f), font, Pause);
+        Button pauseButton = MakeButton(canvasGo.transform, "II", new Vector2(-16f, -16f), font, Pause);
         RectTransform rt = pauseButton.GetComponent<RectTransform>();
-        rt.anchorMin = rt.anchorMax = new Vector2(1f, 0f);
-        rt.pivot = new Vector2(1f, 0f);
+        rt.anchorMin = rt.anchorMax = new Vector2(1f, 1f);
+        rt.pivot = new Vector2(1f, 1f);
         rt.sizeDelta = new Vector2(64f, 64f);
     }
 

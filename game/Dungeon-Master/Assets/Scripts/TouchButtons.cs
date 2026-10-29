@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using InputTouchPhase = UnityEngine.InputSystem.TouchPhase;
 
-// Right-side button cluster: 4 discrete movement buttons around a center
-// attack button. Touch only; hidden unless a touchscreen exists.
+// Right-side button cluster: 4 triangle direction buttons for movement
+// around a circular attack button. Touch only; hidden without a touchscreen.
+// Hit zones are measured from live on-screen rects every frame.
 public class TouchButtons : MonoBehaviour
 {
     public static Vector2 MoveVector { get; private set; }
@@ -22,10 +22,9 @@ public class TouchButtons : MonoBehaviour
     private class PadButton
     {
         public Image image;
-        public Vector2 screenCenter;
-        public float radiusPx;
+        public RectTransform rect;
         public bool pressed;
-        public Color idleColor = new Color(1f, 1f, 1f, 0.25f);
+        public Color idleColor;
     }
 
     private GameObject root;
@@ -66,14 +65,16 @@ public class TouchButtons : MonoBehaviour
         foreach (var touch in screen.touches)
         {
             int id = touch.touchId.ReadValue();
-            InputTouchPhase phase = touch.phase.ReadValue();
+            var phase = touch.phase.ReadValue();
             Vector2 pos = touch.position.ReadValue();
-            if (phase != InputTouchPhase.Began && phase != InputTouchPhase.Moved &&
-                phase != InputTouchPhase.Stationary)
+            bool active = phase == UnityEngine.InputSystem.TouchPhase.Began ||
+                          phase == UnityEngine.InputSystem.TouchPhase.Moved ||
+                          phase == UnityEngine.InputSystem.TouchPhase.Stationary;
+            if (!active)
             {
                 if (id == attackTouchId)
                 {
-                    if (phase == InputTouchPhase.Ended &&
+                    if (phase == UnityEngine.InputSystem.TouchPhase.Ended &&
                         Time.time - attackTime < 0.35f &&
                         Vector2.Distance(pos, attackPos) < 40f)
                         attackQueued = true;
@@ -89,7 +90,7 @@ public class TouchButtons : MonoBehaviour
             {
                 // Held: wait for release to judge tap vs drag-away.
             }
-            else if (phase == InputTouchPhase.Began && Inside(attack, pos))
+            else if (phase == UnityEngine.InputSystem.TouchPhase.Began && Inside(attack, pos))
             {
                 attackTouchId = id;
                 attackPos = pos;
@@ -109,13 +110,14 @@ public class TouchButtons : MonoBehaviour
 
     private static bool Inside(PadButton button, Vector2 screenPos)
     {
-        return Vector2.Distance(screenPos, button.screenCenter) < button.radiusPx;
+        float radiusPx = button.rect.rect.width * button.rect.lossyScale.x / 2f;
+        return Vector2.Distance(screenPos, (Vector2)button.rect.position) < radiusPx;
     }
 
     private static void Refresh(PadButton button)
     {
         button.image.color = button.pressed
-            ? new Color(1f, 1f, 1f, 0.6f)
+            ? new Color(1f, 1f, 1f, 0.75f)
             : button.idleColor;
     }
 
@@ -130,18 +132,21 @@ public class TouchButtons : MonoBehaviour
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 20;
         canvasGo.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        float s = canvas.scaleFactor;
 
-        // Cluster center, bottom-right; directions ring it, attack sits middle.
-        Vector2 center = new Vector2(-190f, 200f);
-        MakeButton(canvasGo.transform, attack, center, 120f, new Color(1f, 0.35f, 0.35f, 0.55f), s);
-        MakeButton(canvasGo.transform, up, center + new Vector2(0f, 120f), 96f, up.idleColor, s);
-        MakeButton(canvasGo.transform, down, center + new Vector2(0f, -120f), 96f, down.idleColor, s);
-        MakeButton(canvasGo.transform, left, center + new Vector2(-120f, 0f), 96f, left.idleColor, s);
-        MakeButton(canvasGo.transform, right, center + new Vector2(120f, 0f), 96f, right.idleColor, s);
+        Vector2 center = new Vector2(-115f, 120f);
+        MakeButton(canvasGo.transform, attack, center, 68f, CircleSprite.Get(), 0f,
+            new Color(0.85f, 0.2f, 0.2f, 0.75f));
+        MakeButton(canvasGo.transform, up, center + new Vector2(0f, 75f), 54f, TriangleSprite.Get(), 0f,
+            new Color(0.85f, 0.85f, 0.88f, 0.55f));
+        MakeButton(canvasGo.transform, down, center + new Vector2(0f, -75f), 54f, TriangleSprite.Get(), 180f,
+            new Color(0.85f, 0.85f, 0.88f, 0.55f));
+        MakeButton(canvasGo.transform, left, center + new Vector2(-75f, 0f), 54f, TriangleSprite.Get(), 90f,
+            new Color(0.85f, 0.85f, 0.88f, 0.55f));
+        MakeButton(canvasGo.transform, right, center + new Vector2(75f, 0f), 54f, TriangleSprite.Get(), -90f,
+            new Color(0.85f, 0.85f, 0.88f, 0.55f));
     }
 
-    private void MakeButton(Transform parent, PadButton button, Vector2 offset, float size, Color color, float scale)
+    private void MakeButton(Transform parent, PadButton button, Vector2 offset, float size, Sprite sprite, float rotZ, Color color)
     {
         GameObject go = new GameObject("PadButton");
         go.transform.SetParent(parent, false);
@@ -150,11 +155,19 @@ public class TouchButtons : MonoBehaviour
         rt.pivot = new Vector2(0.5f, 0.5f);
         rt.sizeDelta = new Vector2(size, size);
         rt.anchoredPosition = offset;
-        button.image = go.AddComponent<Image>();
-        button.image.sprite = CircleSprite.Get();
+        button.rect = rt;
+
+        GameObject visual = new GameObject("Visual");
+        visual.transform.SetParent(go.transform, false);
+        RectTransform vrt = visual.AddComponent<RectTransform>();
+        vrt.anchorMin = Vector2.zero;
+        vrt.anchorMax = Vector2.one;
+        vrt.offsetMin = Vector2.zero;
+        vrt.offsetMax = Vector2.zero;
+        vrt.localRotation = Quaternion.Euler(0f, 0f, rotZ);
+        button.image = visual.AddComponent<Image>();
+        button.image.sprite = sprite;
         button.image.color = color;
         button.idleColor = color;
-        button.screenCenter = new Vector2(Screen.width + offset.x * scale, offset.y * scale);
-        button.radiusPx = size / 2f * scale;
     }
 }

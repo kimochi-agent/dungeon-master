@@ -63,8 +63,8 @@ public class HUD : MonoBehaviour
         healthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
         healthFill.color = Color.green;
 
-        coinText = MakeText(canvasGo.transform, "Coins: 0", new Vector2(-16f, -16f), font);
-        powerText = MakeText(canvasGo.transform, "Power-ups: 0", new Vector2(-16f, -48f), font);
+        coinText = MakeText(canvasGo.transform, "Coins: 0", new Vector2(-96f, -16f), font);
+        powerText = MakeText(canvasGo.transform, "Power-ups: 0", new Vector2(-96f, -48f), font);
     }
 
     private Text MakeText(Transform parent, string text, Vector2 pos, Font font)
