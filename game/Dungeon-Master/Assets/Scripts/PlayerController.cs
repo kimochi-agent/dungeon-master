@@ -2,13 +2,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // Step 1: moves the player across the dungeon floor (WASD/arrows or gamepad).
-// Touch controls arrive in step 5.
+// First-person rework: movement is body-relative (input follows the look yaw).
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float gravity = -20f;
-    [SerializeField] private float turnSpeed = 12f;
 
     public float speedMultiplier = 1f; // Step 7 (additive): speed power-up.
 
@@ -41,15 +40,16 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         Vector2 input = ReadMoveInput();
-        Vector3 move = new Vector3(input.x, 0f, input.y);
-        if (move.sqrMagnitude > 1f)
-            move.Normalize();
+        if (input.sqrMagnitude > 1f)
+            input.Normalize();
 
-        if (move.sqrMagnitude > 0.0001f)
-        {
-            Quaternion target = Quaternion.LookRotation(move, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, target, turnSpeed * Time.deltaTime);
-        }
+        Vector3 forward = transform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+        Vector3 right = transform.right;
+        right.y = 0f;
+        right.Normalize();
+        Vector3 move = right * input.x + forward * input.y;
 
         if (controller.isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;

@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using InputTouchPhase = UnityEngine.InputSystem.TouchPhase;
 
-// Step 9: melee attack. Space / left-click / gamepad-A / right-half screen tap
-// hits monsters within range. Touch taps poll the touchscreen directly.
+// Step 9: melee attack. Space / left-click / gamepad-A / quick right-half tap
+// hits monsters within range. Drags are looks (FirstPersonLook), not attacks.
 public class PlayerAttack : MonoBehaviour
 {
     [SerializeField] private float range = 2.5f;
@@ -11,6 +11,9 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float cooldown = 0.4f;
 
     private float cooldownTimer;
+    private int tapTouchId = -1;
+    private Vector2 tapPos;
+    private float tapTime;
 
     private void Update()
     {
@@ -40,9 +43,30 @@ public class PlayerAttack : MonoBehaviour
         {
             foreach (var touch in screen.touches)
             {
-                if (touch.phase.ReadValue() == InputTouchPhase.Began &&
-                    touch.position.ReadValue().x > Screen.width / 2f)
-                    return true;
+                int id = touch.touchId.ReadValue();
+                InputTouchPhase phase = touch.phase.ReadValue();
+                Vector2 pos = touch.position.ReadValue();
+                if (id == tapTouchId)
+                {
+                    if (phase == InputTouchPhase.Ended)
+                    {
+                        bool quick = Time.time - tapTime < 0.35f;
+                        bool still = Vector2.Distance(pos, tapPos) < 40f;
+                        tapTouchId = -1;
+                        if (quick && still)
+                            return true;
+                    }
+                    else if (phase == InputTouchPhase.Canceled || phase == InputTouchPhase.None)
+                    {
+                        tapTouchId = -1;
+                    }
+                }
+                else if (tapTouchId == -1 && phase == InputTouchPhase.Began && pos.x > Screen.width / 2f)
+                {
+                    tapTouchId = id;
+                    tapPos = pos;
+                    tapTime = Time.time;
+                }
             }
         }
         return false;

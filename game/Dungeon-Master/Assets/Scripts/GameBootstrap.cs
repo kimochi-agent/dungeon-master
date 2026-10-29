@@ -2,6 +2,7 @@ using UnityEngine;
 
 // Step 1: builds the dungeon, player, camera and light automatically when play
 // starts, so no manual scene setup is needed. Skips if a DungeonRoot exists.
+// First-person rework: head-mounted camera, own body hidden.
 public static class GameBootstrap
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -20,8 +21,7 @@ public static class GameBootstrap
         player.AddComponent<CharacterController>();
         player.AddComponent<PlayerController>();
         player.AddComponent<PlayerHealth>(); // Step 4 (additive).
-        Renderer renderer = player.GetComponent<Renderer>();
-        renderer.sharedMaterial = SharedMaterials.Tinted(renderer, new Color(0.2f, 0.5f, 1f));
+        player.GetComponent<Renderer>().enabled = false; // First-person: hide own body.
 
         Camera camera = Camera.main;
         if (camera == null)
@@ -31,10 +31,10 @@ public static class GameBootstrap
             camera = cameraGo.AddComponent<Camera>();
         }
         camera.backgroundColor = new Color(0.05f, 0.05f, 0.08f);
-        FollowCamera follow = camera.GetComponent<FollowCamera>();
-        if (follow == null)
-            follow = camera.gameObject.AddComponent<FollowCamera>();
-        follow.target = player.transform;
+        camera.transform.SetParent(player.transform, false);
+        camera.transform.localPosition = new Vector3(0f, 1.6f, 0f);
+        camera.transform.localRotation = Quaternion.identity;
+        player.AddComponent<FirstPersonLook>();
 
         // Step 2 (additive): scatter collectibles through the dungeon.
         GameObject loot = new GameObject("Collectibles");

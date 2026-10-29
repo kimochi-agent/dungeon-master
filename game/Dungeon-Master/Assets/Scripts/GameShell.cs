@@ -37,7 +37,8 @@ public class GameShell : MonoBehaviour
     private void Update()
     {
         var keyboard = Keyboard.current;
-        if (keyboard != null && (keyboard.escapeKey.wasPressedThisFrame || keyboard.pKey.wasPressedThisFrame))
+        // P pauses (Esc is reserved: it exits pointer lock). First-person rework.
+        if (keyboard != null && keyboard.pKey.wasPressedThisFrame)
         {
             if (IsPlaying && !pausePanel.activeSelf)
                 Pause();
@@ -61,6 +62,7 @@ public class GameShell : MonoBehaviour
         overPanel.SetActive(false);
         Time.timeScale = 1f;
         IsPlaying = true;
+        Cursor.lockState = CursorLockMode.Locked; // First-person: capture mouse.
     }
 
     public void Pause()
@@ -70,6 +72,7 @@ public class GameShell : MonoBehaviour
         pausePanel.SetActive(true);
         Time.timeScale = 0f;
         IsPlaying = false;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     public void Resume()
@@ -77,6 +80,7 @@ public class GameShell : MonoBehaviour
         pausePanel.SetActive(false);
         Time.timeScale = 1f;
         IsPlaying = true;
+        Cursor.lockState = CursorLockMode.Locked; // First-person: capture mouse.
     }
 
     public void Restart()
@@ -93,6 +97,7 @@ public class GameShell : MonoBehaviour
         overPanel.SetActive(true);
         Time.timeScale = 0f;
         IsPlaying = false;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     private void ShowMenu()
@@ -102,6 +107,7 @@ public class GameShell : MonoBehaviour
         menuPanel.SetActive(true);
         Time.timeScale = 0f;
         IsPlaying = false;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     private void EnsureEventSystem()
