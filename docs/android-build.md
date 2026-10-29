@@ -11,7 +11,7 @@
 ## Build
 
 - In Unity: `Build > Android APK (Dungeon Master)`, or from a terminal:
-  `Unity -batchmode -quit -projectPath game/Dungeon-Master -executeMethod BuildScript.BuildAndroid`
+  `& "C:\Program Files\Unity\Hub\Editor\6000.6.7f1\Editor\Unity.exe" -batchmode -nographics -quit -projectPath "C:\Users\Kim\Desktop\MetaDevHackathon\dungeon-master\game\Dungeon-Master" -executeMethod BuildScript.BuildAndroid -logFile "C:\Users\Kim\Desktop\MetaDevHackathon\dungeon-master\game\Dungeon-Master\Builds\build.log`
 - Output: `game/Dungeon-Master/Builds/DungeonMaster.apk` (git-ignored).
 
 ## Install and verify
