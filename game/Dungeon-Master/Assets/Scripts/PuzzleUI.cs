@@ -163,7 +163,9 @@ public class PuzzleUI : MonoBehaviour
         rt.offsetMax = Vector2.zero;
         go.AddComponent<Image>().color = new Color(0.85f, 0.88f, 0.92f);
         Button button = go.AddComponent<Button>();
-        optionLabels[index] = MakeRowText(go.transform, "?", 28, 0f, 1f, font);
+        optionLabels[index] = MakeRowText(parent, "?", 28, yMin, yMin + 0.13f, font);
+        optionLabels[index].raycastTarget = false;
+        optionLabels[index].transform.SetAsLastSibling();
         int captured = index;
         button.onClick.AddListener(() => OnAnswer(captured));
     }
@@ -195,6 +197,9 @@ public class PuzzleUI : MonoBehaviour
         Text t = go.AddComponent<Text>();
         t.font = font;
         t.fontSize = size;
+        t.resizeTextForBestFit = true;
+        t.resizeTextMinSize = 8;
+        t.resizeTextMaxSize = size;
         t.text = text;
         t.color = new Color(0.12f, 0.12f, 0.14f);
         t.alignment = TextAnchor.MiddleCenter;
