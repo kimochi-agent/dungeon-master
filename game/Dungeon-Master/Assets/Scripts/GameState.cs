@@ -1,12 +1,23 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 // Shared run state: collected coins and power-ups. HUD (step 4) will read this.
 // Step 12: also tracks kills and damage taken to feed contextual puzzles.
+// TotalCoins is the persisted lifetime count shown on the home scene.
 public static class GameState
 {
     public static int Coins;
     public static readonly List<string> PowerUps = new List<string>();
+
+    private const string TotalCoinsKey = "DungeonMaster_TotalCoins";
+    public static int TotalCoins { get; private set; }
+
+    static GameState()
+    {
+        TotalCoins = PlayerPrefs.GetInt(TotalCoinsKey, 0);
+    }
+
     public static int Kills;
     public static int DamageTaken;
 
@@ -15,6 +26,9 @@ public static class GameState
     public static void AddCoins(int amount)
     {
         Coins += amount;
+        TotalCoins += amount; // Banked immediately; Reset() only clears the run count.
+        PlayerPrefs.SetInt(TotalCoinsKey, TotalCoins);
+        PlayerPrefs.Save();
         Changed?.Invoke();
     }
 

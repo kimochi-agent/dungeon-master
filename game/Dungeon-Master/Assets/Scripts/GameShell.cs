@@ -5,21 +5,19 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// Step 6: main menu, pause, game-over/victory and restart. Built in code.
-// Game starts frozen on the menu; Start begins play. ShowGameOver(message) is
-// the end-screen API (wired to victory in step 13).
+// Step 6: pause, game-over/victory and restart for the Dungeon scene. Built
+// in code. Home is a separate scene (HomeScreen); the run starts immediately
+// on scene load. ShowGameOver(title, message) is the end-screen API.
 public class GameShell : MonoBehaviour
 {
     public static GameShell Instance { get; private set; }
 
     public bool IsPlaying { get; private set; }
 
-    private GameObject menuPanel;
     private GameObject pausePanel;
     private GameObject overPanel;
     private Text overTitle;
     private Text overText;
-    private static bool autoStart; // Play Again: skip the home screen after reload.
     private bool won; // Step 13 (additive).
     private DungeonGenerator dungeon; // Step 13 (additive).
     private Transform player; // Step 13 (additive).
@@ -33,12 +31,7 @@ public class GameShell : MonoBehaviour
         var controller = FindFirstObjectByType<PlayerController>(); // Step 13 (additive).
         if (controller != null)
             player = controller.transform;
-        ShowMenu();
-        if (autoStart)
-        {
-            autoStart = false;
-            StartGame();
-        }
+        StartGame();
     }
 
     private void Update()
@@ -64,7 +57,6 @@ public class GameShell : MonoBehaviour
 
     public void StartGame()
     {
-        menuPanel.SetActive(false);
         pausePanel.SetActive(false);
         overPanel.SetActive(false);
         Time.timeScale = 1f;
@@ -90,22 +82,20 @@ public class GameShell : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked; // First-person: capture mouse.
     }
 
-    // Play Again: reload straight back into the run.
+    // Play Again: reload the Dungeon scene straight back into the run.
     public void Restart()
     {
         Time.timeScale = 1f;
-        autoStart = true;
         GameState.Reset();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // Home: reload and land on the home screen.
+    // Home: back to the home scene.
     public void GoHome()
     {
         Time.timeScale = 1f;
-        autoStart = false;
         GameState.Reset();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(SceneNames.Home);
     }
 
     public void ShowGameOver(string message)
@@ -119,16 +109,6 @@ public class GameShell : MonoBehaviour
         overText.text = message;
         pausePanel.SetActive(false);
         overPanel.SetActive(true);
-        Time.timeScale = 0f;
-        IsPlaying = false;
-        Cursor.lockState = CursorLockMode.None;
-    }
-
-    private void ShowMenu()
-    {
-        overPanel.SetActive(false);
-        pausePanel.SetActive(false);
-        menuPanel.SetActive(true);
         Time.timeScale = 0f;
         IsPlaying = false;
         Cursor.lockState = CursorLockMode.None;
@@ -154,12 +134,6 @@ public class GameShell : MonoBehaviour
         canvas.sortingOrder = 50;
         canvasGo.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         canvasGo.AddComponent<GraphicRaycaster>();
-
-        menuPanel = Panel(canvasGo.transform, "Menu", new Vector2(480f, 300f));
-        MakeText(menuPanel.transform, "DUNGEON MASTER", 40, new Vector2(0f, 70f), new Vector2(440f, 60f), font);
-        MakeText(menuPanel.transform, "Explore. Loot. Solve.", 22, new Vector2(0f, 10f), new Vector2(440f, 36f), font);
-        MakeButton(menuPanel.transform, "Start", new Vector2(0f, -80f), font, StartGame);
-        MakeText(menuPanel.transform, "Left pad: move + attack | Right stick: look", 16, new Vector2(0f, -128f), new Vector2(440f, 30f), font);
 
         pausePanel = Panel(canvasGo.transform, "Pause", new Vector2(400f, 300f));
         MakeText(pausePanel.transform, "Paused", 34, new Vector2(0f, 80f), new Vector2(360f, 50f), font);

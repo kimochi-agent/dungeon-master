@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Step 1: builds the dungeon, player, camera and light automatically when play
-// starts, so no manual scene setup is needed. Skips if a DungeonRoot exists.
+// Step 1: builds the dungeon, player, camera and light automatically when the
+// Dungeon scene loads, so no manual scene setup is needed. Skips on the Home
+// scene (it owns its own UI) and if a DungeonRoot already exists.
 // First-person rework: head-mounted camera, own body hidden.
 public static class GameBootstrap
 {
@@ -23,6 +24,8 @@ public static class GameBootstrap
 
     private static void Build()
     {
+        if (SceneManager.GetActiveScene().name == SceneNames.Home)
+            return; // Home scene: HomeScreen (authored in the scene) owns the UI.
         if (GameObject.Find("DungeonRoot") != null)
             return;
 
