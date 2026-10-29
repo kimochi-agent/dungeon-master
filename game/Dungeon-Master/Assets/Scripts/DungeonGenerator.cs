@@ -72,10 +72,7 @@ public class DungeonGenerator : MonoBehaviour
         AddBox("CeilingCorridor2", new Vector3(36f, 3.25f, 0f), new Vector3(8f, 0.5f, 4f), ceilingColor);
         AddBox("CeilingC", new Vector3(46f, 3.25f, 0f), new Vector3(12f, 0.5f, 12f), ceilingColor);
 
-        // Warm lights per hall.
-        AddLight(new Vector3(0f, 2.5f, 0f));
-        AddLight(new Vector3(25f, 2.5f, 0f));
-        AddLight(new Vector3(46f, 2.5f, 0f));
+        // No lights: the player's torch (PlayerTorch) is the only light.
     }
 
     // Full wall of given length. If alongX, the wall runs north-south (faces east/west).
@@ -127,15 +124,4 @@ public class DungeonGenerator : MonoBehaviour
         go.AddComponent<Gate>();
     }
 
-    private void AddLight(Vector3 position)
-    {
-        GameObject go = new GameObject("HallLight");
-        go.transform.SetParent(transform, false);
-        go.transform.position = position;
-        Light light = go.AddComponent<Light>();
-        light.type = LightType.Point;
-        light.color = new Color(1f, 0.8f, 0.6f);
-        light.intensity = 20f;
-        light.range = 16f;
-    }
 }
