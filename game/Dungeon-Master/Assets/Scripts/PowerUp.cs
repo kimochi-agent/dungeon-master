@@ -22,16 +22,18 @@ public class PowerUp : Collectible
                 var controller = FindFirstObjectByType<PlayerController>();
                 if (controller != null)
                     controller.ApplySpeedBoost(1.5f, 10f);
+                HUD.Instance?.ShowToast("Speed Boost x1.5!");
                 break;
             case PowerUpKind.Health:
                 var health = FindFirstObjectByType<PlayerHealth>();
-                if (health != null)
-                    health.Heal(50);
+                int healed = health != null ? health.Heal(50) : 0;
+                HUD.Instance?.ShowToast(healed > 0 ? $"+{healed} Health!" : "Health Full!");
                 break;
             case PowerUpKind.Shield:
                 var shielded = FindFirstObjectByType<PlayerHealth>();
                 if (shielded != null)
                     shielded.AddShield(3);
+                HUD.Instance?.ShowToast("Shield +3!");
                 break;
         }
     }

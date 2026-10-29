@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity = -20f;
 
     public float speedMultiplier = 1f; // Step 7 (additive): speed power-up.
+    public bool SpeedBoostActive => speedBoostRoutine != null;
 
     private CharacterController controller;
     private float verticalVelocity;
