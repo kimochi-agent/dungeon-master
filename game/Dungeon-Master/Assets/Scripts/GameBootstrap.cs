@@ -1,12 +1,27 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // Step 1: builds the dungeon, player, camera and light automatically when play
 // starts, so no manual scene setup is needed. Skips if a DungeonRoot exists.
 // First-person rework: head-mounted camera, own body hidden.
 public static class GameBootstrap
 {
+    // NOTE: RuntimeInitializeOnLoadMethod fires only once, after the FIRST scene
+    // load at startup — never on later LoadScene calls. Restarts/Home reload
+    // the scene, so we also rebuild from sceneLoaded every time.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Start()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        Build();
+    }
+
+    private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Build();
+    }
+
+    private static void Build()
     {
         if (GameObject.Find("DungeonRoot") != null)
             return;
@@ -21,7 +36,7 @@ public static class GameBootstrap
         player.AddComponent<CharacterController>();
         player.AddComponent<PlayerController>();
         player.AddComponent<PlayerHealth>(); // Step 4 (additive).
-        player.GetComponent<Renderer>().enabled = false; // First-person: hide own body.
+        player.GetComponent<Renderer>().enabled = true; // First-person: hide own body.
 
         Camera camera = Camera.main;
         if (camera == null)
