@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Step 9: melee attack. Space / left-click / gamepad-A / move-stick tap
+// Step 9: melee attack. Space / left-click / gamepad-A / attack button
 // hits monsters within range.
 public class PlayerAttack : MonoBehaviour
 {
@@ -34,7 +34,7 @@ public class PlayerAttack : MonoBehaviour
         var gamepad = Gamepad.current;
         if (gamepad != null && gamepad.buttonSouth.wasPressedThisFrame)
             return true;
-        return MoveJoystick.ConsumeAttack();
+        return AttackButton.ConsumeAttack();
     }
 
     private void Attack()

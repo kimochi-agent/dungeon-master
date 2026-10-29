@@ -62,14 +62,19 @@ public static class GameBootstrap
         GameObject hud = new GameObject("HUD");
         hud.AddComponent<HUD>();
 
-        // Step 5 (additive): touch joystick (hidden unless a touchscreen exists).
-        GameObject stick = new GameObject("TouchJoystick");
-        stick.AddComponent<TouchJoystick>();
+        // Look (additive): invisible full-screen drag look (touch only).
+        // TouchJoystick circular stick is kept in the repo but unused.
+        GameObject look = new GameObject("LookDrag");
+        look.AddComponent<LookDrag>();
 
-        // Left stick (additive): analog move stick, tap to attack.
+        // Left stick (additive): analog move stick.
         // TouchButtons triangle pad is kept in the repo but unused (touch issues).
         GameObject moveStick = new GameObject("MoveJoystick");
         moveStick.AddComponent<MoveJoystick>();
+
+        // Attack (additive): circular attack button, bottom-right.
+        GameObject atk = new GameObject("AttackButton");
+        atk.AddComponent<AttackButton>();
 
         // Step 6 (additive): menu / pause / game-over shell.
         GameObject shell = new GameObject("GameShell");

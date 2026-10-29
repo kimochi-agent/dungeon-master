@@ -2,35 +2,23 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-// Analog circular move stick, bottom-left: same feel as the look stick.
-// Drag to move (analog output); a quick tap on it attacks. Replaces the
-// triangle pad (TouchButtons.cs, kept in the repo but unused) which had
-// touch issues. Polls the touchscreen directly (no EnhancedTouch
-// dependency); hidden unless a touchscreen exists. Hit zones are measured
-// from live on-screen rects every frame.
+// Analog circular move stick, bottom-left. Drag to move (analog output).
+// Attack lives on the separate AttackButton. Replaces the triangle pad
+// (TouchButtons.cs, kept in the repo but unused) which had touch issues.
+// Polls the touchscreen directly (no EnhancedTouch dependency); hidden
+// unless a touchscreen exists. Hit zones are measured from live
+// on-screen rects every frame. Publishes its zone so LookDrag ignores it.
 public class MoveJoystick : MonoBehaviour
 {
     public static Vector2 MoveVector { get; private set; }
 
-    private static bool attackQueued;
-
-    public static bool ConsumeAttack()
-    {
-        if (!attackQueued)
-            return false;
-        attackQueued = false;
-        return true;
-    }
-
-    private const float TapMaxSeconds = 0.3f;
-    private const float TapMaxMovePx = 25f;
+    public static Vector2 ZoneCenterPx { get; private set; }
+    public static float ZoneRadiusPx { get; private set; }
 
     private GameObject root;
     private RectTransform baseRt;
     private RectTransform knob;
     private int activeTouchId = -1;
-    private Vector2 pressPos;
-    private float pressTime;
 
     private void Awake()
     {
@@ -40,7 +28,8 @@ public class MoveJoystick : MonoBehaviour
     private void OnDestroy()
     {
         MoveVector = Vector2.zero;
-        attackQueued = false;
+        ZoneCenterPx = Vector2.zero;
+        ZoneRadiusPx = 0f;
         activeTouchId = -1;
     }
 
@@ -51,7 +40,8 @@ public class MoveJoystick : MonoBehaviour
         {
             root.SetActive(false);
             MoveVector = Vector2.zero;
-            attackQueued = false;
+            ZoneCenterPx = Vector2.zero;
+            ZoneRadiusPx = 0f;
             activeTouchId = -1;
             return;
         }
@@ -61,6 +51,8 @@ public class MoveJoystick : MonoBehaviour
         float baseRadiusPx = baseRt.rect.width * baseRt.lossyScale.x / 2f;
         float deflectPx = baseRadiusPx * 0.75f;
         float capturePx = baseRadiusPx * 1.2f;
+        ZoneCenterPx = basePx;
+        ZoneRadiusPx = capturePx;
 
         bool found = false;
         foreach (var touch in screen.touches)
@@ -70,17 +62,9 @@ public class MoveJoystick : MonoBehaviour
             if (id == activeTouchId)
             {
                 found = true;
-                if (phase == UnityEngine.InputSystem.TouchPhase.Ended)
-                {
-                    Vector2 pos = touch.position.ReadValue();
-                    if (Time.time - pressTime < TapMaxSeconds &&
-                        Vector2.Distance(pos, pressPos) < TapMaxMovePx &&
-                        (GameShell.Instance == null || GameShell.Instance.IsPlaying))
-                        attackQueued = true;
-                    Release();
-                }
-                else if (phase == UnityEngine.InputSystem.TouchPhase.Canceled ||
-                         phase == UnityEngine.InputSystem.TouchPhase.None)
+                if (phase == UnityEngine.InputSystem.TouchPhase.Ended ||
+                    phase == UnityEngine.InputSystem.TouchPhase.Canceled ||
+                    phase == UnityEngine.InputSystem.TouchPhase.None)
                 {
                     Release();
                 }
@@ -97,8 +81,6 @@ public class MoveJoystick : MonoBehaviour
                      Vector2.Distance(touch.position.ReadValue(), basePx) < capturePx)
             {
                 activeTouchId = id;
-                pressPos = touch.position.ReadValue();
-                pressTime = Time.time;
                 found = true;
             }
         }

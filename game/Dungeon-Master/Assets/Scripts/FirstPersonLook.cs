@@ -2,14 +2,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // First-person look: mouse movement turns the view on desktop (while the
-// pointer is locked); the left touch stick turns it on mobile. Yaw rotates
+// pointer is locked); dragging anywhere on the touchscreen turns it on
+// mobile (except over the move stick and attack button). Yaw rotates
 // the player body, pitch rotates the head camera. Click re-locks on desktop.
 [RequireComponent(typeof(PlayerController))]
 public class FirstPersonLook : MonoBehaviour
 {
-    [SerializeField] private float mouseSensitivity = 0.12f;
-    [SerializeField] private float stickYawRate = 150f;
-    [SerializeField] private float stickPitchRate = 110f;
+    [SerializeField] private float mouseSensitivity = 0.02f;
+    [SerializeField] private float dragSensitivity = 0.25f;
 
     private Camera headCamera;
     private float pitch;
@@ -35,9 +35,9 @@ public class FirstPersonLook : MonoBehaviour
             mouse.leftButton.wasPressedThisFrame)
             Cursor.lockState = CursorLockMode.Locked;
 
-        Vector2 stick = TouchJoystick.Vector;
-        if (stick.sqrMagnitude > 0.0001f)
-            ApplyLook(stick.x * stickYawRate * Time.deltaTime, -stick.y * stickPitchRate * Time.deltaTime);
+        Vector2 dragPx = LookDrag.ConsumeDelta();
+        if (dragPx.sqrMagnitude > 0.0001f)
+            ApplyLook(dragPx.x * dragSensitivity, -dragPx.y * dragSensitivity);
     }
 
     private void ApplyLook(float yawDelta, float pitchDelta)

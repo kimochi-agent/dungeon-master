@@ -2,10 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-// Step 5: fixed circular look stick, bottom-right. Polls the touchscreen
-// control directly (no EnhancedTouch dependency). Hidden unless a touchscreen
-// exists. Hit zones are measured from live on-screen rects every frame, so
-// they always match the visuals. Drives the camera (look).
+// UNUSED (legacy): fixed circular look stick. Kept in the repo but never
+// added to the scene — LookDrag (invisible full-screen drag look) replaced it.
 public class TouchJoystick : MonoBehaviour
 {
     public static Vector2 Vector { get; private set; }

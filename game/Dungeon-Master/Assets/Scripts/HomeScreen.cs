@@ -73,7 +73,7 @@ public class HomeScreen : MonoBehaviour
         MakeButton(panel.transform, "Start", new Vector2(0f, -5f), font, StartRun);
         MakeButton(panel.transform, "Settings", new Vector2(0f, -72f), font, OpenSettings);
         MakeButton(panel.transform, "Exit", new Vector2(0f, -139f), font, ExitGame);
-        MakeText(panel.transform, "Left stick: move, tap to attack | Right stick: look", 16, new Vector2(0f, -183f), new Vector2(440f, 24f), font);
+        MakeText(panel.transform, "Left stick: move | Drag screen: look | Red button: attack", 16, new Vector2(0f, -183f), new Vector2(440f, 24f), font);
 
         settingsPanel = Panel(canvasGo.transform, "Settings", new Vector2(400f, 240f));
         MakeText(settingsPanel.transform, "Settings", 34, new Vector2(0f, 70f), new Vector2(360f, 50f), font);
