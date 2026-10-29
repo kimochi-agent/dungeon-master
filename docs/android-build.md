@@ -27,3 +27,6 @@
 
 - APK is debug-signed; Play Store upload needs a release keystore + AAB (later step).
 - Touch layout tuned for phones; tablets unverified.
+- If a device log says `Can't add component because class 'X' doesn't exist`,
+  that is managed code stripping (IL2CPP). `Assets/link.xml` already preserves
+  the physics module; keep stripping at Medium or lower unless you re-test.

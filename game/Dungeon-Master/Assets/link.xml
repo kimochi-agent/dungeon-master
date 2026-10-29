@@ -1,0 +1,7 @@
+<linker>
+  <!-- Code stripping (IL2CPP) removes physics types the static analyzer cannot
+       see referenced, which breaks CreatePrimitive at runtime on device
+       ("Can't add component because class 'XCollider' doesn't exist").
+       Preserve the whole physics module instead. -->
+  <assembly fullname="UnityEngine.PhysicsModule" preserve="all"/>
+</linker>
