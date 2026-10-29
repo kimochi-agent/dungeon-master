@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-// Left-side button cluster: 4 triangle direction buttons for movement
-// around a circular attack button. Touch only; hidden without a touchscreen.
-// Hit zones are measured from live on-screen rects every frame.
+// UNUSED (legacy): triangle direction-button cluster for movement around a
+// circular attack button. Kept in the repo but never added to the scene —
+// MoveJoystick (analog stick, tap to attack) replaced it after touch issues.
 public class TouchButtons : MonoBehaviour
 {
     public static Vector2 MoveVector { get; private set; }

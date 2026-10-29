@@ -80,7 +80,7 @@ public class PlayerController : MonoBehaviour
         if (gamepad != null)
             input += gamepad.leftStick.ReadValue();
 
-        input += TouchButtons.MoveVector; // Right cluster: discrete move buttons.
+        input += MoveJoystick.MoveVector; // Left stick: analog move; tap attacks.
 
         return input;
     }

@@ -66,9 +66,10 @@ public static class GameBootstrap
         GameObject stick = new GameObject("TouchJoystick");
         stick.AddComponent<TouchJoystick>();
 
-        // Right cluster (additive): movement buttons + attack button.
-        GameObject pad = new GameObject("TouchButtons");
-        pad.AddComponent<TouchButtons>();
+        // Left stick (additive): analog move stick, tap to attack.
+        // TouchButtons triangle pad is kept in the repo but unused (touch issues).
+        GameObject moveStick = new GameObject("MoveJoystick");
+        moveStick.AddComponent<MoveJoystick>();
 
         // Step 6 (additive): menu / pause / game-over shell.
         GameObject shell = new GameObject("GameShell");
