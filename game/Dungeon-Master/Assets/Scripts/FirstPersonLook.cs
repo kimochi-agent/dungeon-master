@@ -1,20 +1,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using InputTouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 // First-person look: mouse movement turns the view on desktop (while the
-// pointer is locked); right-half touch drag turns it on mobile. Yaw rotates
+// pointer is locked); the left touch stick turns it on mobile. Yaw rotates
 // the player body, pitch rotates the head camera. Click re-locks on desktop.
 [RequireComponent(typeof(PlayerController))]
 public class FirstPersonLook : MonoBehaviour
 {
     [SerializeField] private float mouseSensitivity = 0.12f;
-    [SerializeField] private float touchSensitivity = 0.3f;
+    [SerializeField] private float stickYawRate = 150f;
+    [SerializeField] private float stickPitchRate = 110f;
 
     private Camera headCamera;
     private float pitch;
-    private int lookTouchId = -1;
-    private Vector2 lastTouchPos;
 
     private void Awake()
     {
@@ -37,39 +35,9 @@ public class FirstPersonLook : MonoBehaviour
             mouse.leftButton.wasPressedThisFrame)
             Cursor.lockState = CursorLockMode.Locked;
 
-        var screen = Touchscreen.current;
-        if (screen == null)
-            return;
-        bool found = false;
-        foreach (var touch in screen.touches)
-        {
-            int id = touch.touchId.ReadValue();
-            InputTouchPhase phase = touch.phase.ReadValue();
-            Vector2 pos = touch.position.ReadValue();
-            if (id == lookTouchId)
-            {
-                found = true;
-                if (phase == InputTouchPhase.Ended || phase == InputTouchPhase.Canceled ||
-                    phase == InputTouchPhase.None)
-                {
-                    lookTouchId = -1;
-                }
-                else if (phase == InputTouchPhase.Moved)
-                {
-                    Vector2 drag = pos - lastTouchPos;
-                    ApplyLook(drag.x * touchSensitivity, -drag.y * touchSensitivity);
-                    lastTouchPos = pos;
-                }
-            }
-            else if (lookTouchId == -1 && phase == InputTouchPhase.Began && pos.x > Screen.width / 2f)
-            {
-                lookTouchId = id;
-                lastTouchPos = pos;
-                found = true;
-            }
-        }
-        if (lookTouchId != -1 && !found)
-            lookTouchId = -1;
+        Vector2 stick = TouchJoystick.Vector;
+        if (stick.sqrMagnitude > 0.0001f)
+            ApplyLook(stick.x * stickYawRate * Time.deltaTime, stick.y * stickPitchRate * Time.deltaTime);
     }
 
     private void ApplyLook(float yawDelta, float pitchDelta)

@@ -80,7 +80,7 @@ public class PlayerController : MonoBehaviour
         if (gamepad != null)
             input += gamepad.leftStick.ReadValue();
 
-        input += TouchJoystick.Vector; // Step 5 (additive): touch joystick.
+        input += TouchButtons.MoveVector; // Right cluster: discrete move buttons.
 
         return input;
     }

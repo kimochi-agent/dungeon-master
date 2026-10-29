@@ -5,6 +5,7 @@ using InputTouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 // Step 5: fixed virtual joystick, bottom-left. Polls the touchscreen control
 // directly (no EnhancedTouch dependency). Hidden unless a touchscreen exists.
+// Drives the camera (look); movement is the right button cluster.
 public class TouchJoystick : MonoBehaviour
 {
     public static Vector2 Vector { get; private set; }
@@ -99,7 +100,9 @@ public class TouchJoystick : MonoBehaviour
         baseRt.pivot = new Vector2(0.5f, 0.5f);
         baseRt.sizeDelta = new Vector2(240f, 240f);
         baseRt.anchoredPosition = new Vector2(150f, 170f);
-        baseGo.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.25f);
+        Image baseImage = baseGo.AddComponent<Image>();
+        baseImage.sprite = CircleSprite.Get();
+        baseImage.color = new Color(1f, 1f, 1f, 0.25f);
 
         GameObject knobGo = new GameObject("Knob");
         knobGo.transform.SetParent(baseGo.transform, false);
@@ -108,7 +111,9 @@ public class TouchJoystick : MonoBehaviour
         knob.pivot = new Vector2(0.5f, 0.5f);
         knob.sizeDelta = new Vector2(110f, 110f);
         knob.anchoredPosition = Vector2.zero;
-        knobGo.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.6f);
+        Image knobImage = knobGo.AddComponent<Image>();
+        knobImage.sprite = CircleSprite.Get();
+        knobImage.color = new Color(1f, 1f, 1f, 0.6f);
 
         // Base center in screen pixels (matches touch coordinates).
         Vector2 baseCanvas = new Vector2(150f, 170f);
