@@ -13,6 +13,9 @@ public class DungeonAtmosphere : MonoBehaviour
         RenderSettings.fogDensity = 0.028f;
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
         RenderSettings.ambientLight = Color.black;
+        RenderSettings.ambientIntensity = 0f; // Belt and suspenders: no ambient in any mode.
+        RenderSettings.reflectionIntensity = 0f; // Metals go fully dark without direct light.
+        RenderSettings.skybox = null; // No skybox rendering or skybox-ambient leak.
     }
 
 }
