@@ -54,6 +54,9 @@ public static class GameBootstrap
         camera.transform.localRotation = Quaternion.identity;
         player.AddComponent<FirstPersonLook>();
 
+        // Hand torch (additive): the player's own light radius.
+        player.AddComponent<PlayerTorch>();
+
         // Step 2 (additive): scatter collectibles through the dungeon.
         GameObject loot = new GameObject("Collectibles");
         loot.AddComponent<CollectiblePlacer>();
@@ -87,16 +90,8 @@ public static class GameBootstrap
         // Step 9 (additive): melee attack.
         player.AddComponent<PlayerAttack>();
 
-        if (GameObject.Find("Sun") == null)
-        {
-            GameObject sun = new GameObject("Sun");
-            Light light = sun.AddComponent<Light>();
-            light.type = LightType.Directional;
-            light.intensity = 0.6f;
-            sun.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
-        }
-
-        // Atmosphere (additive): fog, torchlight and mood. After Sun (dims it).
+        // Atmosphere (additive): fog, torchlight and mood. No sun: the dungeon
+        // is indoors, lit only by hall lights, torches and the player's torch.
         GameObject atmosphere = new GameObject("DungeonAtmosphere");
         atmosphere.AddComponent<DungeonAtmosphere>();
     }

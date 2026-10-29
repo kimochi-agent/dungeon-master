@@ -12,6 +12,7 @@ public class DungeonGenerator : MonoBehaviour
 
     private Color floorColor;
     private Color wallColor;
+    private Color ceilingColor;
 
     private void Awake()
     {
@@ -23,6 +24,7 @@ public class DungeonGenerator : MonoBehaviour
     {
         floorColor = new Color(0.32f, 0.30f, 0.34f);
         wallColor = new Color(0.45f, 0.32f, 0.24f);
+        ceilingColor = new Color(0.24f, 0.19f, 0.2f);
 
         // Hall A: 20x20 centered on origin, doorway on the east side.
         AddBox("FloorA", new Vector3(0f, -0.25f, 0f), new Vector3(20f, 0.5f, 20f), floorColor);
@@ -62,6 +64,13 @@ public class DungeonGenerator : MonoBehaviour
         AddWall(new Vector3(52f, 0f, 0f), 12f, true);
         AddWallWithDoor(new Vector3(40f, 0f, 0f), 12f, true);
         HallCCenter = new Vector3(46f, 1f, 0f);
+
+        // Ceilings: close the rooms (slabs flush with wall tops at y=3).
+        AddBox("CeilingA", new Vector3(0f, 3.25f, 0f), new Vector3(20f, 0.5f, 20f), ceilingColor);
+        AddBox("CeilingCorridor", new Vector3(14f, 3.25f, 0f), new Vector3(8f, 0.5f, 4f), ceilingColor);
+        AddBox("CeilingB", new Vector3(25f, 3.25f, 0f), new Vector3(14f, 0.5f, 14f), ceilingColor);
+        AddBox("CeilingCorridor2", new Vector3(36f, 3.25f, 0f), new Vector3(8f, 0.5f, 4f), ceilingColor);
+        AddBox("CeilingC", new Vector3(46f, 3.25f, 0f), new Vector3(12f, 0.5f, 12f), ceilingColor);
 
         // Warm lights per hall.
         AddLight(new Vector3(0f, 2.5f, 0f));
