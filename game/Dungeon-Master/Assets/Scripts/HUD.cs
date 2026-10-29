@@ -5,7 +5,7 @@ using UnityEngine.UI;
 // every frame from PlayerHealth and GameState.
 public class HUD : MonoBehaviour
 {
-    private Image healthFill;
+    private RectTransform fillRt;
     private Text coinText;
     private Text powerText;
     private PlayerHealth health;
@@ -18,10 +18,12 @@ public class HUD : MonoBehaviour
 
     private void Update()
     {
+        if (health == null)
+            health = FindFirstObjectByType<PlayerHealth>();
         if (health != null)
         {
-            float fraction = (float)health.CurrentHealth / health.MaxHealth;
-            healthFill.fillAmount = fraction; // Green width = health; red backing = missing.
+            float fraction = Mathf.Clamp01((float)health.CurrentHealth / health.MaxHealth);
+            fillRt.anchorMax = new Vector2(fraction, 1f); // Green width = health; red backing = missing.
         }
         coinText.text = $"Coins: {GameState.Coins}";
         powerText.text = $"Power-ups: {GameState.PowerUps.Count}";
@@ -51,16 +53,12 @@ public class HUD : MonoBehaviour
 
         GameObject fillGo = new GameObject("Fill");
         fillGo.transform.SetParent(barBg.transform, false);
-        RectTransform fillRt = fillGo.AddComponent<RectTransform>();
+        fillRt = fillGo.AddComponent<RectTransform>();
         fillRt.anchorMin = Vector2.zero;
         fillRt.anchorMax = Vector2.one;
         fillRt.offsetMin = Vector2.zero;
         fillRt.offsetMax = Vector2.zero;
-        healthFill = fillGo.AddComponent<Image>();
-        healthFill.type = Image.Type.Filled;
-        healthFill.fillMethod = Image.FillMethod.Horizontal;
-        healthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
-        healthFill.color = Color.green;
+        fillGo.AddComponent<Image>().color = Color.green;
 
         coinText = MakeText(canvasGo.transform, "Coins: 0", new Vector2(-96f, -16f), font);
         powerText = MakeText(canvasGo.transform, "Power-ups: 0", new Vector2(-96f, -48f), font);
