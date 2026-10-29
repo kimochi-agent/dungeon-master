@@ -8,6 +8,13 @@ public class Chest : Collectible, IPuzzleLock
 
     public bool isLocked = false;
     public Transform LockTransform => transform;
+    public bool DestroyOnFail => true;
+    public float TimeLimitSeconds => GameConfig.Current.puzzleTimeLimit;
+
+    public void OnPuzzleFailed()
+    {
+        Destroy(gameObject); // No loot, no retry: a failed chest is gone.
+    }
 
     private bool opened;
     private Transform lidPivot;

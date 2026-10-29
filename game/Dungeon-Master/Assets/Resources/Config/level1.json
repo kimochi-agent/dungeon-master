@@ -1,1 +1,1 @@
-{"chestCount": 2, "coinCount": 10, "lockedChestCount": 2, "monsterCount": 3, "monsterDamage": 10, "monsterHealth": 30, "monsterSpeed": 3.0, "playerMaxHealth": 100, "playerMoveSpeed": 5.0, "powerUpCount": 3}
+{"chestCount": 2, "coinCount": 10, "lockedChestCount": 2, "monsterCount": 3, "monsterDamage": 10, "monsterHealth": 30, "monsterSpeed": 3.0, "playerMaxHealth": 100, "playerMoveSpeed": 5.0, "powerUpCount": 3, "puzzleTimeLimit": 10.0}

@@ -6,6 +6,10 @@ using UnityEngine;
 public class Gate : MonoBehaviour, IPuzzleLock
 {
     public Transform LockTransform => transform;
+    public bool DestroyOnFail => false; // Gates stay forgiving: retry freely.
+    public float TimeLimitSeconds => 0f; // Untimed.
+
+    public void OnPuzzleFailed() { }
 
     private bool opened;
     private Transform player;

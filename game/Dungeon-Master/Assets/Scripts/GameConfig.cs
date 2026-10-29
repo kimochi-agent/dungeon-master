@@ -16,6 +16,7 @@ public class LevelData
     public int monsterDamage = 10;
     public int monsterHealth = 30;
     public float monsterSpeed = 3f;
+    public float puzzleTimeLimit = 10f; // Chest countdown; tune per level hardness.
 }
 
 public static class GameConfig

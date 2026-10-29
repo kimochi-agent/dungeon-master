@@ -28,6 +28,10 @@ public class PuzzleUI : MonoBehaviour
     private GameObject panel;
     private Text questionText;
     private Text feedbackText;
+    private Text timerLabel;
+    private float timeLimit;
+    private float timeLeft;
+    private bool resolved;
     private readonly Text[] optionLabels = new Text[3];
     private IPuzzleLock currentLock;
     private IPuzzleLock dismissedLock;
@@ -51,6 +55,11 @@ public class PuzzleUI : MonoBehaviour
         for (int i = 0; i < 3; i++)
             optionLabels[i].text = current.options[i];
         feedbackText.text = "Pick the right answer to unlock.";
+        timeLimit = puzzleLock.TimeLimitSeconds;
+        timeLeft = timeLimit;
+        resolved = false;
+        timerLabel.gameObject.SetActive(timeLimit > 0f);
+        UpdateTimerLabel();
         playerController = FindFirstObjectByType<PlayerController>();
         if (playerController != null)
             playerController.enabled = false;
@@ -60,6 +69,23 @@ public class PuzzleUI : MonoBehaviour
 
     private void Update()
     {
+        if (open && !resolved && timeLimit > 0f)
+        {
+            timeLeft -= Time.deltaTime;
+            UpdateTimerLabel();
+            if (timeLeft <= 0f)
+            {
+                if (currentLock != null && currentLock.DestroyOnFail)
+                    FailLock("Too slow! The chest is destroyed.");
+                else
+                {
+                    HUD.Instance?.ShowToast("Too slow!");
+                    Close(true);
+                }
+                return;
+            }
+        }
+
         // Re-arm a skipped lock once the player walks away from it.
         if (open || dismissedLock == null)
             return;
@@ -85,9 +111,14 @@ public class PuzzleUI : MonoBehaviour
             return;
         if (index == current.correctIndex)
         {
+            resolved = true;
             feedbackText.text = "Correct! Unlocked.";
             currentLock.UnlockAndOpen();
             StartCoroutine(CloseAfter(0.8f));
+        }
+        else if (currentLock != null && currentLock.DestroyOnFail)
+        {
+            FailLock("Wrong! The chest is destroyed.");
         }
         else
         {
@@ -99,6 +130,19 @@ public class PuzzleUI : MonoBehaviour
     {
         yield return new WaitForSeconds(seconds);
         Close(false);
+    }
+
+    private void FailLock(string toast)
+    {
+        resolved = true;
+        HUD.Instance?.ShowToast(toast);
+        currentLock?.OnPuzzleFailed();
+        Close(true);
+    }
+
+    private void UpdateTimerLabel()
+    {
+        timerLabel.text = $"{Mathf.Max(0, Mathf.CeilToInt(timeLeft))}s";
     }
 
     private void Close(bool skipped)
@@ -147,8 +191,10 @@ public class PuzzleUI : MonoBehaviour
         pr.offsetMax = Vector2.zero;
         panel.AddComponent<Image>().color = new Color(0.95f, 0.93f, 0.88f);
 
-        MakeRowText(panel.transform, "Locked Chest", 26, 0.84f, 0.96f, font);
-        questionText = MakeRowText(panel.transform, "?", 40, 0.62f, 0.82f, font);
+        MakeRowText(panel.transform, "Locked Chest", 26, 0.87f, 0.97f, font);
+        timerLabel = MakeRowText(panel.transform, "10s", 24, 0.79f, 0.86f, font);
+        timerLabel.color = new Color(0.8f, 0.15f, 0.15f);
+        questionText = MakeRowText(panel.transform, "?", 36, 0.60f, 0.78f, font);
         for (int i = 0; i < 3; i++)
             MakeRowButton(panel.transform, i, 0.45f - i * 0.15f, font);
         feedbackText = MakeRowText(panel.transform, "", 20, 0.02f, 0.12f, font);
