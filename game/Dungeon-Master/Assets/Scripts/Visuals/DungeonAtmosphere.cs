@@ -8,7 +8,7 @@ public class DungeonAtmosphere : MonoBehaviour
     private void Awake()
     {
         RenderSettings.fog = true;
-        RenderSettings.fogColor = new Color(0.05f, 0.05f, 0.08f);
+        RenderSettings.fogColor = Color.black; // Pure void: silhouettes impossible.
         RenderSettings.fogMode = FogMode.ExponentialSquared;
         RenderSettings.fogDensity = 0.028f;
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;

@@ -48,7 +48,8 @@ public static class GameBootstrap
             cameraGo.tag = "MainCamera";
             camera = cameraGo.AddComponent<Camera>();
         }
-        camera.backgroundColor = new Color(0.05f, 0.05f, 0.08f);
+        camera.clearFlags = CameraClearFlags.SolidColor;
+        camera.backgroundColor = Color.black; // Pure void: unlit far objects blend invisibly.
         camera.transform.SetParent(player.transform, false);
         camera.transform.localPosition = new Vector3(0f, 1.6f, 0f);
         camera.transform.localRotation = Quaternion.identity;
