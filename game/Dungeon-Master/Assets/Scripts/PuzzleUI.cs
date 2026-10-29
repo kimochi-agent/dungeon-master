@@ -48,6 +48,8 @@ public class PuzzleUI : MonoBehaviour
     {
         if (open || puzzleLock == null || puzzleLock == dismissedLock)
             return;
+        if (GameShell.Instance != null && !GameShell.Instance.IsPlaying)
+            return; // No popups over pause/end screens.
         EnsureBuilt();
         currentLock = puzzleLock;
         current = MathPuzzle.Generate();
@@ -107,7 +109,7 @@ public class PuzzleUI : MonoBehaviour
 
     private void OnAnswer(int index)
     {
-        if (!open)
+        if (!open || resolved)
             return;
         if (index == current.correctIndex)
         {
@@ -128,7 +130,7 @@ public class PuzzleUI : MonoBehaviour
 
     private IEnumerator CloseAfter(float seconds)
     {
-        yield return new WaitForSeconds(seconds);
+        yield return new WaitForSecondsRealtime(seconds); // Unscaled: pause can't wedge us open.
         Close(false);
     }
 
