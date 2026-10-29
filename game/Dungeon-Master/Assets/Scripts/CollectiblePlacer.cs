@@ -59,8 +59,8 @@ public class CollectiblePlacer : MonoBehaviour
 
     public static GameObject CreateCoin(Vector3 position)
     {
-        GameObject go = Primitive(new GameObject("Coin"), PrimitiveType.Cylinder,
-            new Vector3(0.55f, 0.1f, 0.55f), new Color(1f, 0.78f, 0.15f));
+        GameObject go = CoinVisual.Create(); // Mesh + finish live in Visuals/.
+        go.transform.SetParent(Root().transform, false);
         go.transform.position = position;
         go.AddComponent<Coin>();
         return go;
@@ -124,7 +124,7 @@ public class CollectiblePlacer : MonoBehaviour
         return go;
     }
 
-    private static GameObject Root()
+    internal static GameObject Root()
     {
         GameObject root = GameObject.Find("Collectibles");
         if (root == null)

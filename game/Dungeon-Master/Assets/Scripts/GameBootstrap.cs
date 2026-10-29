@@ -95,5 +95,9 @@ public static class GameBootstrap
             light.intensity = 0.6f;
             sun.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
         }
+
+        // Atmosphere (additive): fog, torchlight and mood. After Sun (dims it).
+        GameObject atmosphere = new GameObject("DungeonAtmosphere");
+        atmosphere.AddComponent<DungeonAtmosphere>();
     }
 }

@@ -7,6 +7,7 @@ using UnityEngine;
 public static class SharedMaterials
 {
     private static readonly Dictionary<Color, Material> cache = new Dictionary<Color, Material>();
+    private static readonly Dictionary<(Color, float, float), Material> metalCache = new Dictionary<(Color, float, float), Material>();
     private static Material baseMaterial;
     private static bool lookedUpBase;
 
@@ -18,6 +19,24 @@ public static class SharedMaterials
             material = new Material(template);
             material.color = color;
             cache[color] = material;
+        }
+        return material;
+    }
+
+    // Metallic variant for coins and treasure. Metallic/smoothness are plain
+    // uniforms on URP Lit (no new shader keywords), so this adds zero new
+    // shader variants to the build. Cached per color+finish (flyweight).
+    public static Material TintedMetallic(Renderer source, Color color, float metallic, float smoothness)
+    {
+        var key = (color, metallic, smoothness);
+        if (!metalCache.TryGetValue(key, out Material material) || material == null)
+        {
+            Material template = BaseMaterial() ?? source.sharedMaterial;
+            material = new Material(template);
+            material.color = color;
+            material.SetFloat("_Metallic", metallic);
+            material.SetFloat("_Smoothness", smoothness);
+            metalCache[key] = material;
         }
         return material;
     }

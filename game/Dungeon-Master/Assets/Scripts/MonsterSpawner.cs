@@ -27,6 +27,7 @@ public class MonsterSpawner : MonoBehaviour
         Object.Destroy(go.GetComponent<CapsuleCollider>());
         Renderer monsterRenderer = go.GetComponent<Renderer>();
         monsterRenderer.sharedMaterial = SharedMaterials.Tinted(monsterRenderer, new Color(0.8f, 0.15f, 0.15f));
+        MonsterVisual.Attach(go); // Eyes. Pure visuals; Monster.cs untouched.
         go.AddComponent<CharacterController>();
         go.AddComponent<Monster>();
     }
