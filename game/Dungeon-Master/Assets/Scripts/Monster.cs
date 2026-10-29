@@ -3,6 +3,7 @@ using UnityEngine;
 
 // Step 8: basic monster. Wanders until the player is close, then chases and
 // damages on contact. Step 9: takes damage, flashes, dies into coin drops.
+// Attacks pause while a lock puzzle is open (player engaged, can't dodge).
 [RequireComponent(typeof(CharacterController))]
 public class Monster : MonoBehaviour
 {
@@ -61,7 +62,7 @@ public class Monster : MonoBehaviour
         {
             move = distance > 0.01f ? toPlayer.normalized * chaseSpeed : Vector3.zero;
             Face(move);
-            if (distance < attackRange && cooldownTimer <= 0f)
+            if (distance < attackRange && cooldownTimer <= 0f && !PuzzleUI.IsOpen)
             {
                 cooldownTimer = attackCooldown;
                 playerHealth?.TakeDamage(damage);

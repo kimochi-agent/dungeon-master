@@ -36,6 +36,10 @@ public class PuzzleUI : MonoBehaviour
     private Transform playerTransform;
     private bool open;
 
+    // True while the player is engaged with a chest/gate puzzle. Static form
+    // avoids instantiating the lazy singleton just to ask.
+    public static bool IsOpen => instance != null && instance.open;
+
     public void Show(IPuzzleLock puzzleLock)
     {
         if (open || puzzleLock == null || puzzleLock == dismissedLock)

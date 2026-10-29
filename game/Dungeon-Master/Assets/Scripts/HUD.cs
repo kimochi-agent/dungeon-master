@@ -21,8 +21,7 @@ public class HUD : MonoBehaviour
         if (health != null)
         {
             float fraction = (float)health.CurrentHealth / health.MaxHealth;
-            healthFill.fillAmount = fraction;
-            healthFill.color = Color.Lerp(Color.red, Color.green, fraction);
+            healthFill.fillAmount = fraction; // Green width = health; red backing = missing.
         }
         coinText.text = $"Coins: {GameState.Coins}";
         powerText.text = $"Power-ups: {GameState.PowerUps.Count}";
@@ -48,7 +47,7 @@ public class HUD : MonoBehaviour
         bgRt.pivot = new Vector2(0f, 1f);
         bgRt.anchoredPosition = new Vector2(16f, -16f);
         bgRt.sizeDelta = new Vector2(260f, 28f);
-        barBg.AddComponent<Image>().color = new Color(0.1f, 0.1f, 0.12f, 0.8f);
+        barBg.AddComponent<Image>().color = new Color(0.75f, 0.12f, 0.12f, 0.9f);
 
         GameObject fillGo = new GameObject("Fill");
         fillGo.transform.SetParent(barBg.transform, false);
