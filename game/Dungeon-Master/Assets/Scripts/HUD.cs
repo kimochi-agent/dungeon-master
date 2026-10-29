@@ -54,8 +54,8 @@ public class HUD : MonoBehaviour
         RectTransform fillRt = fillGo.AddComponent<RectTransform>();
         fillRt.anchorMin = Vector2.zero;
         fillRt.anchorMax = Vector2.one;
-        fillRt.offsetMin = new Vector2(3f, 3f);
-        fillRt.offsetMax = new Vector2(-3f, -3f);
+        fillRt.offsetMin = Vector2.zero;
+        fillRt.offsetMax = Vector2.zero;
         healthFill = fillGo.AddComponent<Image>();
         healthFill.type = Image.Type.Filled;
         healthFill.fillMethod = Image.FillMethod.Horizontal;
