@@ -49,11 +49,30 @@ jobs:
           }
 
       - name: Build APK with Unity
-        run: >
-          & "${env:UNITY_PATH}" -batchmode -nographics -quit
-          -projectPath "${{ github.workspace }}\game\Dungeon-Master"
-          -executeMethod BuildScript.BuildAndroid
-          -logFile "${{ github.workspace }}\game\Dungeon-Master\Builds\build.log"
+        run: |
+          $exe = $env:UNITY_PATH
+          $ws = '${{ github.workspace }}'
+          $out = Join-Path $env:RUNNER_TEMP 'unity-stdout.log'
+          $err = Join-Path $env:RUNNER_TEMP 'unity-stderr.log'
+          $buildArgs = '-batchmode -nographics -quit -projectPath "{0}\game\Dungeon-Master" -executeMethod BuildScript.BuildAndroid -logFile "{0}\game\Dungeon-Master\Builds\build.log"' -f $ws
+          $sw = [System.Diagnostics.Stopwatch]::StartNew()
+          $p = Start-Process -FilePath $exe -ArgumentList $buildArgs -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError $err
+          Write-Host ("Launched Unity PID {0}, waiting for it to exit..." -f $p.Id)
+          $lastBeat = [datetime]::UtcNow
+          while (-not $p.HasExited) {
+            Start-Sleep -Seconds 10
+            if (([datetime]::UtcNow - $lastBeat).TotalMinutes -ge 2) {
+              $lastBeat = [datetime]::UtcNow
+              Write-Host ("... still waiting on Unity PID {0} ({1:N0}s elapsed)" -f $p.Id, $sw.Elapsed.TotalSeconds)
+            }
+          }
+          $sw.Stop()
+          Write-Host ("Unity finished: exit={0} after {1:N0}s" -f $p.ExitCode, $sw.Elapsed.TotalSeconds)
+          Write-Host '--- Unity stdout (tail) ---'
+          if (Test-Path $out) { Get-Content $out -Tail 30 } else { Write-Host '(no stdout captured)' }
+          Write-Host '--- Unity stderr (tail) ---'
+          if (Test-Path $err) { Get-Content $err -Tail 30 } else { Write-Host '(no stderr captured)' }
+          if ($p.ExitCode -ne 0) { exit $p.ExitCode }
         env:
           UNITY_PATH: C:\Program Files\Unity\Hub\Editor\6000.6.7f1\Editor\Unity.exe
 
@@ -80,4 +99,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-log
-          path: game/Dungeon-Master/Builds/build.log
+          path: |
+            game/Dungeon-Master/Builds/build.log
+            ${{ runner.temp }}/unity-stdout.log
+            ${{ runner.temp }}/unity-stderr.log
