@@ -62,6 +62,10 @@ Notes:
 - The CI APK is debug-signed, same as the local build.
 - If Unity is installed at a different path, update `UNITY_PATH` in the
   workflow file.
+- Never open the runner's `_work` project copy in the Unity Editor: a second
+  Unity instance makes the build abort within seconds with an empty-looking
+  log. If a run's Unity step finishes in seconds with no APK, kill any stale
+  `Unity.exe`, delete the runner's `_work\dungeon-master` folder, and re-run.
 - Alternative if you ever get a paid Unity seat: a `UNITY_SERIAL` secret lets
   the build run on GitHub-hosted runners via game-ci instead.
 

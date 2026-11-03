@@ -30,6 +30,24 @@ jobs:
         with:
           lfs: true
 
+      - name: Check no other Unity holds this project
+        run: |
+          $here = "${{ github.workspace }}\game\Dungeon-Master"
+          $hereFwd = $here -replace '\\','/'
+          $holders = @(Get-CimInstance Win32_Process -Filter "Name='Unity.exe'" -ErrorAction SilentlyContinue |
+            Where-Object { ($_.CommandLine -like "*$here*") -or ($_.CommandLine -like "*$hereFwd*") })
+          if ($holders.Count -gt 0) {
+            Write-Host ('::error::Another Unity instance (PID {0}) already has this project copy open. A second Unity aborts the build within seconds. Close the Editor on the runner workspace copy (never open _work in the Editor) and re-run.' -f ($holders.Id -join ', '))
+            exit 1
+          }
+          if (-not (Get-Process Unity -ErrorAction SilentlyContinue)) {
+            $lock = 'game/Dungeon-Master/Temp/UnityLockfile'
+            if (Test-Path $lock) {
+              Remove-Item $lock -Force
+              Write-Host 'Removed stale UnityLockfile (no Unity process running).'
+            }
+          }
+
       - name: Build APK with Unity
         run: >
           & "${env:UNITY_PATH}" -batchmode -nographics -quit
