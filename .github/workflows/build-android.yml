@@ -20,7 +20,7 @@ jobs:
   build:
     name: Build DungeonMaster.apk
     runs-on: self-hosted
-    timeout-minutes: 60
+    timeout-minutes: 120
     defaults:
       run:
         shell: powershell
@@ -38,6 +38,17 @@ jobs:
           -logFile "${{ github.workspace }}\game\Dungeon-Master\Builds\build.log"
         env:
           UNITY_PATH: C:\Program Files\Unity\Hub\Editor\6000.6.7f1\Editor\Unity.exe
+
+      - name: Verify APK exists
+        run: |
+          $apk = 'game/Dungeon-Master/Builds/DungeonMaster.apk'
+          if (-not (Test-Path $apk)) {
+            Write-Host '::error::APK missing - Unity exited 0 but produced no build. Last 80 log lines:'
+            $log = 'game/Dungeon-Master/Builds/build.log'
+            if (Test-Path $log) { Get-Content $log -Tail 80 } else { Write-Host '(no build.log found)' }
+            exit 1
+          }
+          Write-Host "APK OK: $((Get-Item $apk).Length) bytes"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4

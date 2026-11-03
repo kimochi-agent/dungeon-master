@@ -36,7 +36,10 @@ only, and game-ci deleted their activation helper action. So the job runs on
 your own PC, where Unity is already activated. No secrets needed.
 
 One-time runner setup (on the build PC, which needs git + git-lfs and the
-Unity Editor above):
+Unity Editor above). Then allow the runner to execute its scripts
+(elevated PowerShell, one time only):
+`Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine`
+
 
 1. Repo page > Settings > Actions > Runners > New self-hosted runner >
    Windows. Download the runner package and extract it to a folder that is
