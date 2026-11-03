@@ -6,9 +6,10 @@ drop in `level3.json` and it joins the campaign automatically.
 
 ## Campaign flow
 
-- Home → Start always begins at level 1.
-- Reaching a level's `exitPoint` loads the next level file if one exists,
-  otherwise the victory screen ("You cleared all N levels!").
+- Home → Start begins at level 1; a Continue button offers the highest
+  unlocked level (`GameState.NextLevel`, persisted across sessions).
+- Reaching a level's `exitPoint` unlocks the next level and returns home;
+  finishing the last level shows "Campaign Complete!" on the home screen.
 - Death → end screen; Play Again restarts the *current* level.
 - Per-run stats (coins, kills, damage) reset each level; lifetime coin total
   persists. New file = new row in this loop; analytics-driven generation

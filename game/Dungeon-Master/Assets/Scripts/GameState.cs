@@ -13,9 +13,13 @@ public static class GameState
     private const string TotalCoinsKey = "DungeonMaster_TotalCoins";
     public static int TotalCoins { get; private set; }
 
+    private const string NextLevelKey = "DungeonMaster_NextLevel";
+    public static int NextLevel { get; private set; } // Persisted: the level Home offers.
+
     static GameState()
     {
         TotalCoins = PlayerPrefs.GetInt(TotalCoinsKey, 0);
+        NextLevel = Mathf.Max(1, PlayerPrefs.GetInt(NextLevelKey, 1));
     }
 
     public static int Kills;
@@ -48,6 +52,16 @@ public static class GameState
     {
         DamageTaken += amount;
         Changed?.Invoke();
+    }
+
+    public static void UnlockLevel(int level)
+    {
+        if (level > NextLevel)
+        {
+            NextLevel = level;
+            PlayerPrefs.SetInt(NextLevelKey, NextLevel);
+            PlayerPrefs.Save();
+        }
     }
 
     public static void Reset()

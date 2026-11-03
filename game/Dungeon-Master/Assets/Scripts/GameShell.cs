@@ -58,18 +58,8 @@ public class GameShell : MonoBehaviour
     private void OnLevelComplete()
     {
         LevelAnalytics.OnAttemptEnd(LevelEndReason.Completed);
-        int next = GameConfig.LevelIndex + 1;
-        if (GameConfig.HasLevel(next))
-        {
-            GameState.Reset();
-            GameConfig.LoadLevel(next);
-            Time.timeScale = 1f;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-        else
-        {
-            ShowGameOver("Victory!", $"You cleared all {GameConfig.LevelCount} levels!\nCoins: {GameState.Coins}  Kills: {GameState.Kills}");
-        }
+        GameState.UnlockLevel(GameConfig.LevelIndex + 1);
+        GoHome(); // Every completion returns home; Home offers the next level.
     }
 
     public void StartGame()

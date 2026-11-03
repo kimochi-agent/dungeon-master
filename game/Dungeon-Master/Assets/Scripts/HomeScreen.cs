@@ -21,9 +21,19 @@ public class HomeScreen : MonoBehaviour
 
     public void StartRun()
     {
+        StartLevel(1);
+    }
+
+    public void ContinueRun()
+    {
+        StartLevel(GameState.NextLevel);
+    }
+
+    private void StartLevel(int index)
+    {
         Time.timeScale = 1f;
         GameState.Reset();
-        GameConfig.LoadLevel(1);
+        GameConfig.LoadLevel(index);
         SceneManager.LoadScene(SceneNames.Dungeon);
     }
 
@@ -67,14 +77,20 @@ public class HomeScreen : MonoBehaviour
         canvasGo.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         canvasGo.AddComponent<GraphicRaycaster>();
 
-        GameObject panel = Panel(canvasGo.transform, "Home", new Vector2(480f, 420f));
-        MakeText(panel.transform, "DUNGEON MASTER", 40, new Vector2(0f, 155f), new Vector2(440f, 60f), font);
-        MakeText(panel.transform, "Explore. Loot. Solve.", 22, new Vector2(0f, 105f), new Vector2(440f, 36f), font);
-        MakeText(panel.transform, $"Total Coins: {GameState.TotalCoins}", 24, new Vector2(0f, 60f), new Vector2(440f, 40f), font);
-        MakeButton(panel.transform, "Start", new Vector2(0f, -5f), font, StartRun);
-        MakeButton(panel.transform, "Settings", new Vector2(0f, -72f), font, OpenSettings);
-        MakeButton(panel.transform, "Exit", new Vector2(0f, -139f), font, ExitGame);
-        MakeText(panel.transform, "Left stick: move | Drag screen: look | Red button: attack", 16, new Vector2(0f, -183f), new Vector2(440f, 24f), font);
+        GameObject panel = Panel(canvasGo.transform, "Home", new Vector2(480f, 500f));
+        MakeText(panel.transform, "DUNGEON MASTER", 40, new Vector2(0f, 200f), new Vector2(440f, 60f), font);
+        MakeText(panel.transform, "Explore. Loot. Solve.", 22, new Vector2(0f, 152f), new Vector2(440f, 36f), font);
+        MakeText(panel.transform, $"Total Coins: {GameState.TotalCoins}", 24, new Vector2(0f, 108f), new Vector2(440f, 40f), font);
+        string startLabel = GameState.NextLevel > 1 ? "Replay Level 1" : "Start";
+        MakeButton(panel.transform, startLabel, new Vector2(0f, 40f), font, StartRun);
+        bool hasNext = GameConfig.HasLevel(GameState.NextLevel);
+        Button continueButton = MakeButton(panel.transform, $"Play Level {GameState.NextLevel}", new Vector2(0f, -27f), font, ContinueRun);
+        continueButton.gameObject.SetActive(hasNext);
+        Text completeText = MakeText(panel.transform, "Campaign Complete!", 24, new Vector2(0f, -27f), new Vector2(440f, 40f), font);
+        completeText.gameObject.SetActive(!hasNext && GameState.NextLevel > 1);
+        MakeButton(panel.transform, "Settings", new Vector2(0f, -94f), font, OpenSettings);
+        MakeButton(panel.transform, "Exit", new Vector2(0f, -161f), font, ExitGame);
+        MakeText(panel.transform, "Left stick: move | Drag screen: look | Red button: attack", 16, new Vector2(0f, -212f), new Vector2(440f, 24f), font);
 
         settingsPanel = Panel(canvasGo.transform, "Settings", new Vector2(400f, 240f));
         MakeText(settingsPanel.transform, "Settings", 34, new Vector2(0f, 70f), new Vector2(360f, 50f), font);
