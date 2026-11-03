@@ -56,6 +56,7 @@ public class Chest : Collectible, IPuzzleLock
     private void Open(bool wasLocked = false)
     {
         opened = true;
+        GameState.AddChestOpened();
         LevelAnalytics.RecordChestOpened(wasLocked);
         if (lidPivot != null)
             lidPivot.localRotation = Quaternion.Euler(-100f, 0f, 0f);

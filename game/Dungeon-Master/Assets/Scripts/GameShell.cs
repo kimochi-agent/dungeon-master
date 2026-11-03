@@ -5,9 +5,10 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// Step 6: pause, game-over/victory and restart for the Dungeon scene. Built
-// in code. Home is a separate scene (HomeScreen); the run starts immediately
-// on scene load. ShowGameOver(title, message) is the end-screen API.
+// Step 6: pause, level-complete, game-over and restart for the Dungeon
+// scene. Built in code. Home is a separate scene (HomeScreen); the run
+// starts immediately on scene load. Completing a level shows run stats,
+// then Continue returns home where the next level is offered.
 public class GameShell : MonoBehaviour
 {
     public static GameShell Instance { get; private set; }
@@ -18,6 +19,9 @@ public class GameShell : MonoBehaviour
     private GameObject overPanel;
     private Text overTitle;
     private Text overText;
+    private GameObject completePanel;
+    private Text completeTitle;
+    private Text completeStats;
     private bool won; // Step 13 (additive).
     private DungeonGenerator dungeon; // Step 13 (additive).
     private Transform player; // Step 13 (additive).
@@ -59,13 +63,14 @@ public class GameShell : MonoBehaviour
     {
         LevelAnalytics.OnAttemptEnd(LevelEndReason.Completed);
         GameState.UnlockLevel(GameConfig.LevelIndex + 1);
-        GoHome(); // Every completion returns home; Home offers the next level.
+        ShowLevelComplete();
     }
 
     public void StartGame()
     {
         pausePanel.SetActive(false);
         overPanel.SetActive(false);
+        completePanel.SetActive(false);
         Time.timeScale = 1f;
         IsPlaying = true;
         Cursor.lockState = CursorLockMode.Locked; // First-person: capture mouse.
@@ -125,6 +130,18 @@ public class GameShell : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
     }
 
+    public void ShowLevelComplete()
+    {
+        completeTitle.text = $"Level {GameConfig.LevelIndex} Complete!";
+        completeStats.text = $"Coins Collected: {GameState.Coins}\nMonsters Slayed: {GameState.Kills}\nChests Unlocked: {GameState.ChestsOpened}";
+        pausePanel.SetActive(false);
+        overPanel.SetActive(false);
+        completePanel.SetActive(true);
+        Time.timeScale = 0f;
+        IsPlaying = false;
+        Cursor.lockState = CursorLockMode.None;
+    }
+
     private void EnsureEventSystem()
     {
         if (EventSystem.current != null)
@@ -156,6 +173,11 @@ public class GameShell : MonoBehaviour
         overText = MakeText(overPanel.transform, "", 24, new Vector2(0f, 45f), new Vector2(440f, 70f), font);
         MakeButton(overPanel.transform, "Play Again", new Vector2(0f, -45f), font, Restart);
         MakeButton(overPanel.transform, "Home", new Vector2(0f, -112f), font, GoHome);
+
+        completePanel = Panel(canvasGo.transform, "LevelComplete", new Vector2(480f, 340f));
+        completeTitle = MakeText(completePanel.transform, "", 38, new Vector2(0f, 115f), new Vector2(440f, 50f), font);
+        completeStats = MakeText(completePanel.transform, "", 24, new Vector2(0f, 30f), new Vector2(440f, 100f), font);
+        MakeButton(completePanel.transform, "Continue", new Vector2(0f, -105f), font, GoHome);
 
         // Small pause button, bottom-right, always visible during play.
         Button pauseButton = MakeButton(canvasGo.transform, "II", new Vector2(-16f, -16f), font, Pause);

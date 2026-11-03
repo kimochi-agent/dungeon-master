@@ -24,6 +24,7 @@ public static class GameState
 
     public static int Kills;
     public static int DamageTaken;
+    public static int ChestsOpened;
 
     public static event Action Changed;
 
@@ -45,6 +46,12 @@ public static class GameState
     public static void AddKill()
     {
         Kills++;
+        Changed?.Invoke();
+    }
+
+    public static void AddChestOpened()
+    {
+        ChestsOpened++;
         Changed?.Invoke();
     }
 
@@ -70,6 +77,7 @@ public static class GameState
         PowerUps.Clear();
         Kills = 0;
         DamageTaken = 0;
+        ChestsOpened = 0;
         Changed?.Invoke();
     }
 }

@@ -8,8 +8,9 @@ drop in `level3.json` and it joins the campaign automatically.
 
 - Home → Start begins at level 1; a Continue button offers the highest
   unlocked level (`GameState.NextLevel`, persisted across sessions).
-- Reaching a level's `exitPoint` unlocks the next level and returns home;
-  finishing the last level shows "Campaign Complete!" on the home screen.
+- Reaching a level's `exitPoint` unlocks the next level and shows a
+  level-complete screen (run coins, kills, chests); Continue returns home,
+  and finishing the last level shows "Campaign Complete!" there.
 - Death → end screen; Play Again restarts the *current* level.
 - Per-run stats (coins, kills, damage) reset each level; lifetime coin total
   persists. New file = new row in this loop; analytics-driven generation
