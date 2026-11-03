@@ -1,0 +1,19 @@
+VBCSCompilerPreWarmer: watching VBCSCompiler (PID 5308)
+VBCSCompilerPreWarmer: pre-warm launched (dotnet PID 96564)
+VBCSCompiler prewarm took 16.72 ms
+[Licensing::Module] Trying to connect to existing licensing client channel...
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-Kim" at "2026-11-03T10:30:26.0143213Z"
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 97024, path: "C:/Program Files/Unity Hub/UnityLicensingClient_V1/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.3+d7ffd15
+  Session Id:              ef50049607044fb9bbfbb74117236e4d
+  Correlation Id:          4e99e156518b576c7e0c01256f003266
+  External correlation Id: 3333282557554808563
+  Machine Id:              CXmNg40f/Lck1LLLwp4YVotvfRM=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-Kim" (connect: 0.00s, validation: 0.00s, handshake: 0.03s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-Kim-notifications" at "2026-11-03T10:30:26.0491013Z"
+[Licensing::Module] Generating manual activation license file: C:\Users\Kim\Desktop\MetaDevHackathon\dungeon-master\alf/Unity_v6000.6.7f1.alf
+[Licensing::Client] Successfully processed ALF generation request: C:\Users\Kim\Desktop\MetaDevHackathon\dungeon-master\alf\Unity_v6000.6.7f1.alf
+[Licensing::Module] Manual activation license file successfully saved.
+[ExitDontLaunchBugReporter] Exiting without the bug reporter. Application will exit with return code 0

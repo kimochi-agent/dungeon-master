@@ -57,8 +57,8 @@ adb install -r game\Dungeon-Master\Builds\DungeonMaster.apk
 ```
 
 Or push to GitHub: `.github/workflows/build-android.yml` builds the APK
-automatically on pushes touching `game/` (needs the one-time `UNITY_LICENSE`
-setup described in `docs/android-build.md`), and attaches it as a run artifact.
+automatically on pushes touching `game/` via a self-hosted runner on your own
+PC (one-time setup in `docs/android-build.md`), and attaches it as a run artifact.
 
 ## Status and next steps
 
