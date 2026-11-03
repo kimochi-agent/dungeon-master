@@ -16,6 +16,9 @@ concurrency:
   group: android-build
   cancel-in-progress: false
 
+env:
+  APP_VERSION_MAJOR_MINOR: '1.0'
+
 jobs:
   build:
     name: Build DungeonMaster.apk
@@ -29,6 +32,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
+
+      - name: Set build version
+        id: ver
+        run: |
+          $version = "$env:APP_VERSION_MAJOR_MINOR.${{ github.run_number }}"
+          "version=$version" >> $env:GITHUB_OUTPUT
+          Write-Host "Build version: $version"
 
       - name: Check no other Unity holds this project
         run: |
@@ -51,47 +61,62 @@ jobs:
       - name: Build APK with Unity
         run: |
           $exe = $env:UNITY_PATH
+          Remove-Item 'game/Dungeon-Master/Builds/DungeonMaster*.apk' -Force -ErrorAction SilentlyContinue
           $ws = '${{ github.workspace }}'
           $out = Join-Path $env:RUNNER_TEMP 'unity-stdout.log'
           $err = Join-Path $env:RUNNER_TEMP 'unity-stderr.log'
           $buildArgs = '-batchmode -nographics -quit -projectPath "{0}\game\Dungeon-Master" -executeMethod BuildScript.BuildAndroid -logFile "{0}\game\Dungeon-Master\Builds\build.log"' -f $ws
+          $buildArgs += ' -apkVersion "{0}" -apkVersionCode {1}' -f '${{ steps.ver.outputs.version }}', '${{ github.run_number }}'
           $sw = [System.Diagnostics.Stopwatch]::StartNew()
           $p = Start-Process -FilePath $exe -ArgumentList $buildArgs -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError $err
           Write-Host ("Launched Unity PID {0}, waiting for it to exit..." -f $p.Id)
+          $tailed = @{}
+          function Show-NewLines($path) {
+            if (-not (Test-Path $path)) { return }
+            $all = @(Get-Content $path -ErrorAction SilentlyContinue)
+            if ($all.Count -eq 0) { return }
+            $shown = 0
+            if ($tailed.ContainsKey($path)) { $shown = $tailed[$path] }
+            if ($all.Count -gt $shown) {
+              $all | Select-Object -Skip $shown | ForEach-Object { Write-Host $_ }
+              $tailed[$path] = $all.Count
+            }
+          }
+          $buildLog = "{0}\game\Dungeon-Master\Builds\build.log" -f $ws
           $lastBeat = [datetime]::UtcNow
           while (-not $p.HasExited) {
             Start-Sleep -Seconds 10
+            Show-NewLines $buildLog
+            Show-NewLines $err
             if (([datetime]::UtcNow - $lastBeat).TotalMinutes -ge 2) {
               $lastBeat = [datetime]::UtcNow
               Write-Host ("... still waiting on Unity PID {0} ({1:N0}s elapsed)" -f $p.Id, $sw.Elapsed.TotalSeconds)
             }
           }
           $sw.Stop()
+          Show-NewLines $buildLog
+          Show-NewLines $err
           Write-Host ("Unity finished: exit={0} after {1:N0}s" -f $p.ExitCode, $sw.Elapsed.TotalSeconds)
-          Write-Host '--- Unity stdout (tail) ---'
-          if (Test-Path $out) { Get-Content $out -Tail 30 } else { Write-Host '(no stdout captured)' }
-          Write-Host '--- Unity stderr (tail) ---'
-          if (Test-Path $err) { Get-Content $err -Tail 30 } else { Write-Host '(no stderr captured)' }
           if ($p.ExitCode -ne 0) { exit $p.ExitCode }
         env:
           UNITY_PATH: C:\Program Files\Unity\Hub\Editor\6000.6.7f1\Editor\Unity.exe
 
       - name: Verify APK exists
         run: |
-          $apk = 'game/Dungeon-Master/Builds/DungeonMaster.apk'
-          if (-not (Test-Path $apk)) {
+          $apk = Get-ChildItem 'game/Dungeon-Master/Builds/DungeonMaster*.apk' -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($null -eq $apk) {
             Write-Host '::error::APK missing - Unity exited 0 but produced no build. Last 80 log lines:'
             $log = 'game/Dungeon-Master/Builds/build.log'
             if (Test-Path $log) { Get-Content $log -Tail 80 } else { Write-Host '(no build.log found)' }
             exit 1
           }
-          Write-Host "APK OK: $((Get-Item $apk).Length) bytes"
+          Write-Host ("APK OK: {0} ({1:N0} bytes)" -f $apk.Name, $apk.Length)
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DungeonMaster-apk
-          path: game/Dungeon-Master/Builds/DungeonMaster.apk
+          name: DungeonMaster-apk-v${{ steps.ver.outputs.version }}
+          path: game/Dungeon-Master/Builds/DungeonMaster-v*.apk
           if-no-files-found: error
 
       - name: Upload build log on failure

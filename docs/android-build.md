@@ -53,6 +53,16 @@ Unity Editor above). Then allow the runner to execute its scripts
 4. Push any change under `game/` (or Actions > Build Android APK >
    Run workflow) and watch the run go green.
 
+### APK versioning
+
+Each CI build stamps `MAJOR.MINOR.<run-number>` (e.g. `1.0.47`): `MAJOR.MINOR`
+comes from `APP_VERSION_MAJOR_MINOR` at the top of the workflow file -- bump it
+when cutting a release -- and the patch is the ever-increasing GitHub run number,
+also used as the Android `versionCode` (required to increase for Play Store).
+The APK is named `DungeonMaster-v1.0.47.apk` and the artifact
+`DungeonMaster-apk-v1.0.47`. Local builds without `-apkVersion` keep producing
+plain `DungeonMaster.apk`; add `-apkVersion 1.0.99 -apkVersionCode 99` to the
+command line for a versioned local build.
 Notes:
 
 - The PC must be on with the runner listening, or jobs queue until it is.
@@ -66,6 +76,11 @@ Notes:
   Unity instance makes the build abort within seconds with an empty-looking
   log. If a run's Unity step finishes in seconds with no APK, kill any stale
   `Unity.exe`, delete the runner's `_work\dungeon-master` folder, and re-run.
+- Keep the runner's `_work` folder (its `Library/`) intact between runs:
+  incremental builds take ~10 min because Unity reuses it. If you ever wipe
+  it, the next run does a slow full first import; if a fresh import ever
+  aborts in seconds, run one build manually on the runner machine to seed
+  `Library/`, then re-run CI.
 - Alternative if you ever get a paid Unity seat: a `UNITY_SERIAL` secret lets
   the build run on GitHub-hosted runners via game-ci instead.
 
