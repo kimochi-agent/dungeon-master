@@ -120,8 +120,8 @@ public class AttackButton : MonoBehaviour
         baseRt = baseGo.AddComponent<RectTransform>();
         baseRt.anchorMin = baseRt.anchorMax = new Vector2(1f, 0f);
         baseRt.pivot = new Vector2(0.5f, 0.5f);
-        baseRt.sizeDelta = new Vector2(120f, 120f);
-        baseRt.anchoredPosition = new Vector2(-95f, 105f);
+        baseRt.sizeDelta = new Vector2(60f, 60f);
+        baseRt.anchoredPosition = new Vector2(-60f, 80f);
         baseImage = baseGo.AddComponent<Image>();
         baseImage.sprite = CircleSprite.Get();
         baseImage.color = IdleColor;
@@ -135,7 +135,7 @@ public class AttackButton : MonoBehaviour
         labelRt.offsetMax = Vector2.zero;
         Text label = labelGo.AddComponent<Text>();
         label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        label.fontSize = 30;
+        label.fontSize = 20;
         label.text = "ATK";
         label.color = Color.white;
         label.alignment = TextAnchor.MiddleCenter;

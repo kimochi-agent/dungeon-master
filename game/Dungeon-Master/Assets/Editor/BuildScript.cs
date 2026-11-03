@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -11,10 +12,14 @@ public static class BuildScript
     public static void BuildAndroid()
     {
         SceneSetup.EnsureScenes();
+        // Absolute output dir under the project root; the CI runner's working
+        // directory is not guaranteed to be the project folder.
+        string buildsDir = Path.Combine(Directory.GetParent(Application.dataPath).FullName, "Builds");
+        Directory.CreateDirectory(buildsDir);
         var options = new BuildPlayerOptions
         {
             scenes = new[] { SceneSetup.HomeScenePath, SceneSetup.DungeonScenePath },
-            locationPathName = "Builds/DungeonMaster.apk",
+            locationPathName = Path.Combine(buildsDir, "DungeonMaster.apk"),
             target = BuildTarget.Android,
             options = BuildOptions.None,
         };
