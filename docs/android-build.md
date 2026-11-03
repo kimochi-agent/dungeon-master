@@ -25,31 +25,42 @@
 
 ## GitHub Actions (automatic APK on push)
 
-`.github/workflows/build-android.yml` builds the same `BuildScript.BuildAndroid`
-in the cloud (Unity 6000.6.7f1, Android) on every push that touches `game/`,
-plus manual runs. The APK is attached to the run under
-Actions > Build Android APK > Artifacts > `DungeonMaster-apk`.
+`.github/workflows/build-android.yml` runs the same `BuildScript.BuildAndroid`
+on every push that touches `game/` (plus manual runs). The APK is attached to
+the run under Actions > Build Android APK > Artifacts > `DungeonMaster-apk`
+(a `build.log` artifact is attached instead when the build fails).
 
-One-time setup (Unity license for CI):
+Why a self-hosted runner: Unity Personal licenses cannot activate on
+GitHub-hosted runners — offline (`.ulf`) activation is Enterprise/Industry
+only, and game-ci deleted their activation helper action. So the job runs on
+your own PC, where Unity is already activated. No secrets needed.
 
-1. In the GitHub repo: Settings > Secrets and variables > Actions > New secret.
-   Add `UNITY_EMAIL` and `UNITY_PASSWORD` (your Unity ID credentials).
-2. Actions tab > `Request Unity activation file` > Run workflow.
-   Download the `unity-activation-file` artifact (a `.alf` file).
-3. Upload the `.alf` at <https://license.unity3d.com/manual> and download
-   the returned `.ulf` license file.
-4. Back in Actions secrets, add `UNITY_LICENSE` with the full `.ulf` content.
-5. Re-run any build; it should go green. First build takes ~20-40 min
-   (Unity + Android SDK download); later builds reuse the cached `Library/`.
+One-time runner setup (on the build PC, which needs git + git-lfs and the
+Unity Editor above):
+
+1. Repo page > Settings > Actions > Runners > New self-hosted runner >
+   Windows. Download the runner package and extract it to a folder that is
+   NOT inside this repo (e.g. `C:\actions-runner`).
+2. In that folder, run `.\config.cmd --url <repo-url> --token <token>` with
+   the URL/token shown on the page (accept the defaults; the `self-hosted`
+   label is what the workflow asks for).
+3. Run `.\run.cmd` and leave it running while you want builds to trigger.
+   Optionally install it as a service afterwards (`.\svc install` under your
+   own user account so it sees your Unity activation, then `.\svc start`).
+4. Push any change under `game/` (or Actions > Build Android APK >
+   Run workflow) and watch the run go green.
 
 Notes:
 
+- The PC must be on with the runner listening, or jobs queue until it is.
+- Builds reuse the runner's persistent `Library/`, so repeat builds are much
+  faster than the first one (~5-15 min).
 - Pushes that only touch `dashboard/`, `docs/`, etc. do not trigger a build.
 - The CI APK is debug-signed, same as the local build.
-- If `unity-request-activation` ever stops working for new Unity versions,
-  the fallback is the same manual flow: generate a `.alf` on any machine
-  via `Unity -batchmode -createManualActivationFile`, activate it at
-  license.unity3d.com, and store the `.ulf` as `UNITY_LICENSE`.
+- If Unity is installed at a different path, update `UNITY_PATH` in the
+  workflow file.
+- Alternative if you ever get a paid Unity seat: a `UNITY_SERIAL` secret lets
+  the build run on GitHub-hosted runners via game-ci instead.
 
 ## Known gaps
 

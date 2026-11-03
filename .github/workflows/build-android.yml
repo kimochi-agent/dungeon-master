@@ -1,7 +1,8 @@
 name: Build Android APK
 
-# Builds DungeonMaster.apk with Unity 6000.6.7f1 on every push that touches
-# the game (plus manual runs). The APK is uploaded as a run artifact.
+# Builds DungeonMaster.apk on your own PC via a self-hosted runner.
+# (Unity Personal licenses can't activate on GitHub-hosted runners, so the
+# build runs where Unity is already activated. See docs/android-build.md.)
 on:
   push:
     branches: ["**"]
@@ -10,50 +11,33 @@ on:
       - ".github/workflows/build-android.yml"
   workflow_dispatch:
 
+# One build at a time: two Unity instances must not open the same project.
+concurrency:
+  group: android-build
+  cancel-in-progress: false
+
 jobs:
   build:
     name: Build DungeonMaster.apk
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 60
+    defaults:
+      run:
+        shell: powershell
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      # Unity Android builds are big; stock runners run out of disk without this.
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
-
-      - name: Cache Unity Library
-        uses: actions/cache@v4
-        with:
-          path: game/Dungeon-Master/Library
-          key: unity-library-android-6000.6.7f1-${{ hashFiles('game/Dungeon-Master/Packages/manifest.json', 'game/Dungeon-Master/Packages/packages-lock.json', 'game/Dungeon-Master/ProjectSettings/ProjectVersion.txt') }}
-          restore-keys: |
-            unity-library-android-6000.6.7f1-
-            unity-library-android-
-
-      - name: Build with Unity (game-ci)
-        uses: game-ci/unity-builder@v4
+      - name: Build APK with Unity
+        run: >
+          & "${env:UNITY_PATH}" -batchmode -nographics -quit
+          -projectPath "${{ github.workspace }}\game\Dungeon-Master"
+          -executeMethod BuildScript.BuildAndroid
+          -logFile "${{ github.workspace }}\game\Dungeon-Master\Builds\build.log"
         env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          projectPath: game/Dungeon-Master
-          unityVersion: 6000.6.7f1
-          targetPlatform: Android
-          buildMethod: BuildScript.BuildAndroid
-          androidVersionCode: ${{ github.run_number }}
+          UNITY_PATH: C:\Program Files\Unity\Hub\Editor\6000.6.7f1\Editor\Unity.exe
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -61,3 +45,10 @@ jobs:
           name: DungeonMaster-apk
           path: game/Dungeon-Master/Builds/DungeonMaster.apk
           if-no-files-found: error
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: game/Dungeon-Master/Builds/build.log
