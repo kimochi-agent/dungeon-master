@@ -1,8 +1,68 @@
 # Dungeon Master
 
-- **About:** This project is game in development that will be single player initially which would be later made into multi player as well. As the name suggests `Dungeon Master` player will be in a dungeon facing dungeon monsters and explores the dungeon in order to collect collectibles i.e coins, power ups. Exploring the dungeon would also involve solving math puzzles in order to open gates to cross different dungeons or chests.
-Killing monstes would also drop random collectibles, monsters attack would drop our players health by some amount that would be set in `config` file initially, this `config` file would be a game state that handles collectibles per level, monsters per level, player health, types of monsters that will appear.
-Secondly our dungeon or map would be connected by gates which as we earlier stated would require reasoning in order to open them, also chests would require same and will hold collectibles.
-This reasoning questions will mostly revolve aruond the game mechanincs itself and will be based on math around what has already happened so far in our gameplay.
-And also this is not the end ofcourse.
+A single-player, first-person dungeon crawler for mobile (Android first),
+built with Unity 6000.6.7f1 (URP). Explore torch-lit dungeons, fight monsters,
+grab coins and power-ups, and solve math puzzles to open gates and chests.
+Multiplayer is a possible future direction; the game is single-player today.
 
+## Gameplay
+
+- **Explore** a first-person dungeon carrying a torch — the torch is the only
+  light source, with a fixed illumination radius; everything beyond it is dark.
+- **Fight** monsters in real time. Kills can drop random collectibles; monster
+  hits reduce player health. Monsters hold their attacks while you are busy
+  with a chest puzzle.
+- **Collect** coins (persisted as a lifetime total shown on the home screen)
+  and power-ups (with on-screen toast + status indicators).
+- **Solve math puzzles** to open gates and chests. Gates are untimed; chests
+  have a 10-second timer (configurable per level) — a first wrong answer or a
+  timeout destroys the chest. Puzzles can be skipped via the close button.
+- **Progress level by level**: exit a level → level-complete stats screen
+  (coins, kills, chests) → home screen → next level unlocks.
+
+## Controls (landscape)
+
+- Left analog stick: move.
+- Drag anywhere on screen: look.
+- Red ATK button (bottom-right): attack.
+- Pause button (top-right); health bar (green over red, edge-to-edge).
+
+## Project structure
+
+- `game/Dungeon-Master/` — the Unity project (scenes are code-generated at
+  build time: Home + Dungeon).
+- `game/Dungeon-Master/Assets/Resources/Config/levelN.json` — per-level
+  config: dungeon layout seed, monsters, chests, gates, timers, difficulty.
+- `docs/android-build.md` — local + CI build checklist.
+- `docs/levels.md` — level config format.
+- `Plan.md` / `MEMO.md` — build plan and design notes.
+- `dashboard/` + `agents/` — web dashboard and builder/verifier agent loop
+  used during development (`python dashboard/server.py`).
+
+## Getting started
+
+Requirements: Unity Hub + Editor 6000.6.7f1 with Android Build Support,
+and the Android SDK platform-tools (`adb`) for installing on a phone.
+
+Build the APK locally (PowerShell):
+
+```powershell
+& "C:\Program Files\Unity\Hub\Editor\6000.6.7f1\Editor\Unity.exe" -batchmode -nographics -quit -projectPath "<repo>\game\Dungeon-Master" -executeMethod BuildScript.BuildAndroid -logFile "<repo>\game\Dungeon-Master\Builds\build.log"
+```
+
+Install and run:
+
+```powershell
+adb install -r game\Dungeon-Master\Builds\DungeonMaster.apk
+```
+
+Or push to GitHub: `.github/workflows/build-android.yml` builds the APK
+automatically on pushes touching `game/` via a self-hosted runner on your own
+PC (one-time setup in `docs/android-build.md`), and attaches it as a run artifact.
+
+## Status and next steps
+
+Playable end-to-end on Android: home → dungeon → stats → next level, with
+config-driven levels and run analytics collected for future difficulty tuning.
+Known gaps: debug-signed APK only (no release keystore/AAB yet), no death/hurt
+animations, tablets unverified. See `Plan.md` for the remaining build steps.

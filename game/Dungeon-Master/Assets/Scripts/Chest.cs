@@ -2,11 +2,20 @@ using UnityEngine;
 
 // Step 2: unlocked chest. Walking up to it swings the lid open and pops out
 // coins. Step 3: locked chests open the math puzzle instead.
-public class Chest : Collectible
+public class Chest : Collectible, IPuzzleLock
 {
     [SerializeField] private int coinsInside = 5;
 
     public bool isLocked = false;
+    public Transform LockTransform => transform;
+    public bool DestroyOnFail => true;
+    public float TimeLimitSeconds => GameConfig.Current.puzzleTimeLimit;
+
+    public void OnPuzzleFailed()
+    {
+        LevelAnalytics.RecordChestDestroyed();
+        Destroy(gameObject); // No loot, no retry: a failed chest is gone.
+    }
 
     private bool opened;
     private Transform lidPivot;
@@ -41,12 +50,14 @@ public class Chest : Collectible
     public void UnlockAndOpen()
     {
         isLocked = false;
-        Open();
+        Open(true);
     }
 
-    private void Open()
+    private void Open(bool wasLocked = false)
     {
         opened = true;
+        GameState.AddChestOpened();
+        LevelAnalytics.RecordChestOpened(wasLocked);
         if (lidPivot != null)
             lidPivot.localRotation = Quaternion.Euler(-100f, 0f, 0f);
         for (int i = 0; i < coinsInside; i++)

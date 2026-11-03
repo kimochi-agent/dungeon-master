@@ -2,41 +2,62 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // Step 1: moves the player across the dungeon floor (WASD/arrows or gamepad).
-// Touch controls arrive in step 5.
+// First-person rework: movement is body-relative (input follows the look yaw).
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float gravity = -20f;
-    [SerializeField] private float turnSpeed = 12f;
+
+    public float speedMultiplier = 1f; // Step 7 (additive): speed power-up.
+    public bool SpeedBoostActive => speedBoostRoutine != null;
 
     private CharacterController controller;
     private float verticalVelocity;
+    private Coroutine speedBoostRoutine;
+
+    // Step 7 (additive): temporary speed boost. Re-pickup restarts the timer.
+    public void ApplySpeedBoost(float multiplier, float duration)
+    {
+        if (speedBoostRoutine != null)
+            StopCoroutine(speedBoostRoutine);
+        speedBoostRoutine = StartCoroutine(SpeedBoost(duration, multiplier));
+    }
+
+    private System.Collections.IEnumerator SpeedBoost(float duration, float multiplier)
+    {
+        speedMultiplier = multiplier;
+        yield return new WaitForSeconds(duration);
+        speedMultiplier = 1f;
+        speedBoostRoutine = null;
+    }
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+        moveSpeed = GameConfig.Current.playerMoveSpeed; // Step 10: config is source of truth.
     }
 
     private void Update()
     {
         Vector2 input = ReadMoveInput();
-        Vector3 move = new Vector3(input.x, 0f, input.y);
-        if (move.sqrMagnitude > 1f)
-            move.Normalize();
+        if (input.sqrMagnitude > 1f)
+            input.Normalize();
 
-        if (move.sqrMagnitude > 0.0001f)
-        {
-            Quaternion target = Quaternion.LookRotation(move, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, target, turnSpeed * Time.deltaTime);
-        }
+        Vector3 forward = transform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+        Vector3 right = transform.right;
+        right.y = 0f;
+        right.Normalize();
+        Vector3 move = right * input.x + forward * input.y;
 
         if (controller.isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;
         else
             verticalVelocity += gravity * Time.deltaTime;
 
-        controller.Move((move * moveSpeed + Vector3.up * verticalVelocity) * Time.deltaTime);
+        controller.Move((move * moveSpeed * speedMultiplier + Vector3.up * verticalVelocity) * Time.deltaTime);
     }
 
     private static Vector2 ReadMoveInput()
@@ -59,6 +80,8 @@ public class PlayerController : MonoBehaviour
         var gamepad = Gamepad.current;
         if (gamepad != null)
             input += gamepad.leftStick.ReadValue();
+
+        input += MoveJoystick.MoveVector; // Left stick: analog move; tap attacks.
 
         return input;
     }

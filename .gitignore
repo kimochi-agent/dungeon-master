@@ -8,7 +8,9 @@ game/Dungeon-Master/[Ll]ogs/
 game/Dungeon-Master/[Uu]ser[Ss]ettings/
 game/Dungeon-Master/[Mm]emoryCaptures/
 game/Dungeon-Master/[Rr]ecordings/
-game/Dungeon-Master/.vs/
+game/Dungeon-Master/.vscode/
+game/Dungeon-Master/.utmp/
+DuMa_BackUpThisFolder_ButDontShipItWithYourGame/
 *.csproj
 *.slnx
 *.sln

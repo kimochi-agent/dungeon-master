@@ -17,13 +17,24 @@ Status tags: `[TODO]` -> `[IN PROGRESS]` -> `[IN REVIEW]` -> `[PASSED]`, or `[NE
   - Fix: UnityEngine.EventSystems.EventSystem.Update () (at ./Library/PackageCache/com.unity.ugui@eb824e41fbc7/Runtime/UGUI/EventSystem/EventSystem.cs:500)
   - Fix: UnityEngine.StackTraceUtility:ExtractStringFromExceptionInternal(Object, String&, String&)
 4. Player health system with damage intake, death and respawn, plus a basic HUD showing health bar and coin count. [PASSED]
-5. Touch controls for player movement so the game is playable on a mobile phone. [TODO]
-6. Game shell screens: main menu, pause, game over and restart flow. [TODO]
-7. Power-up pickup effects (e.g. speed boost, extra health, shield) applied when collected. [TODO]
-8. A single basic monster type with simple wander/chase movement that damages the player on contact. [TODO]
-9. Player attack, monster death and random collectible drops on kill. [TODO]
-10. Level config data holding collectibles per level, monsters per level, player health and monster types, so tuning needs no code changes. [TODO]
-11. Gates connecting dungeons that reuse the step 3 puzzle UI and require reasoning to open. [TODO]
-12. Puzzle generator that builds math questions from gameplay so far (kills, coins collected, damage taken). [TODO]
-13. Multiple linked dungeons with level progression driven by the level config data. [TODO]
-14. First Android build installed on a real phone, verified from a fresh clone of the repo. [TODO]
+5. Touch controls for player movement so the game is playable on a mobile phone. [PASSED]
+  - Auto-passed on test1 without playtest verdict.
+6. Game shell screens: main menu, pause, game over and restart flow. [PASSED]
+  - Auto-passed on test1 without playtest verdict.
+7. Power-up pickup effects (e.g. speed boost, extra health, shield) applied when collected. [PASSED]
+  - Auto-passed on test1 without playtest verdict.
+8. A single basic monster type with simple wander/chase movement that damages the player on contact. [PASSED]
+  - Auto-passed on test1 without playtest verdict.
+9. Player attack, monster death and random collectible drops on kill. [PASSED]
+  - Auto-passed on test1 without playtest verdict.
+10. Level config data holding collectibles per level, monsters per level, player health and monster types, so tuning needs no code changes. [PASSED]
+  - Auto-passed on test1 without playtest verdict.
+11. Gates connecting dungeons that reuse the step 3 puzzle UI and require reasoning to open. [PASSED]
+  - Auto-passed on test1 without playtest verdict.
+12. Puzzle generator that builds math questions from gameplay so far (kills, coins collected, damage taken). [PASSED]
+  - Auto-passed on test1 without playtest verdict.
+13. Multiple linked dungeons with level progression driven by the level config data. [PASSED]
+  - Auto-passed on test1 without playtest verdict.
+14. First Android build installed on a real phone, verified from a fresh clone of the repo. [PASSED]
+  - Auto-passed on test1 without playtest verdict.
+  - NOTE: build script + checklist only — on-device install still needs you.

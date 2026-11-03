@@ -20,7 +20,7 @@ jobs:
   build:
     name: Build DungeonMaster.apk
     runs-on: self-hosted
-    timeout-minutes: 60
+    timeout-minutes: 120
     defaults:
       run:
         shell: powershell
@@ -30,14 +30,62 @@ jobs:
         with:
           lfs: true
 
+      - name: Check no other Unity holds this project
+        run: |
+          $here = "${{ github.workspace }}\game\Dungeon-Master"
+          $hereFwd = $here -replace '\\','/'
+          $holders = @(Get-CimInstance Win32_Process -Filter "Name='Unity.exe'" -ErrorAction SilentlyContinue |
+            Where-Object { ($_.CommandLine -like "*$here*") -or ($_.CommandLine -like "*$hereFwd*") })
+          if ($holders.Count -gt 0) {
+            Write-Host ('::error::Another Unity instance (PID {0}) already has this project copy open. A second Unity aborts the build within seconds. Close the Editor on the runner workspace copy (never open _work in the Editor) and re-run.' -f ($holders.Id -join ', '))
+            exit 1
+          }
+          if (-not (Get-Process Unity -ErrorAction SilentlyContinue)) {
+            $lock = 'game/Dungeon-Master/Temp/UnityLockfile'
+            if (Test-Path $lock) {
+              Remove-Item $lock -Force
+              Write-Host 'Removed stale UnityLockfile (no Unity process running).'
+            }
+          }
+
       - name: Build APK with Unity
-        run: >
-          & "${env:UNITY_PATH}" -batchmode -nographics -quit
-          -projectPath "${{ github.workspace }}\game\Dungeon-Master"
-          -executeMethod BuildScript.BuildAndroid
-          -logFile "${{ github.workspace }}\game\Dungeon-Master\Builds\build.log"
+        run: |
+          $exe = $env:UNITY_PATH
+          $ws = '${{ github.workspace }}'
+          $out = Join-Path $env:RUNNER_TEMP 'unity-stdout.log'
+          $err = Join-Path $env:RUNNER_TEMP 'unity-stderr.log'
+          $buildArgs = '-batchmode -nographics -quit -projectPath "{0}\game\Dungeon-Master" -executeMethod BuildScript.BuildAndroid -logFile "{0}\game\Dungeon-Master\Builds\build.log"' -f $ws
+          $sw = [System.Diagnostics.Stopwatch]::StartNew()
+          $p = Start-Process -FilePath $exe -ArgumentList $buildArgs -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError $err
+          Write-Host ("Launched Unity PID {0}, waiting for it to exit..." -f $p.Id)
+          $lastBeat = [datetime]::UtcNow
+          while (-not $p.HasExited) {
+            Start-Sleep -Seconds 10
+            if (([datetime]::UtcNow - $lastBeat).TotalMinutes -ge 2) {
+              $lastBeat = [datetime]::UtcNow
+              Write-Host ("... still waiting on Unity PID {0} ({1:N0}s elapsed)" -f $p.Id, $sw.Elapsed.TotalSeconds)
+            }
+          }
+          $sw.Stop()
+          Write-Host ("Unity finished: exit={0} after {1:N0}s" -f $p.ExitCode, $sw.Elapsed.TotalSeconds)
+          Write-Host '--- Unity stdout (tail) ---'
+          if (Test-Path $out) { Get-Content $out -Tail 30 } else { Write-Host '(no stdout captured)' }
+          Write-Host '--- Unity stderr (tail) ---'
+          if (Test-Path $err) { Get-Content $err -Tail 30 } else { Write-Host '(no stderr captured)' }
+          if ($p.ExitCode -ne 0) { exit $p.ExitCode }
         env:
           UNITY_PATH: C:\Program Files\Unity\Hub\Editor\6000.6.7f1\Editor\Unity.exe
+
+      - name: Verify APK exists
+        run: |
+          $apk = 'game/Dungeon-Master/Builds/DungeonMaster.apk'
+          if (-not (Test-Path $apk)) {
+            Write-Host '::error::APK missing - Unity exited 0 but produced no build. Last 80 log lines:'
+            $log = 'game/Dungeon-Master/Builds/build.log'
+            if (Test-Path $log) { Get-Content $log -Tail 80 } else { Write-Host '(no build.log found)' }
+            exit 1
+          }
+          Write-Host "APK OK: $((Get-Item $apk).Length) bytes"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -51,4 +99,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-log
-          path: game/Dungeon-Master/Builds/build.log
+          path: |
+            game/Dungeon-Master/Builds/build.log
+            ${{ runner.temp }}/unity-stdout.log
+            ${{ runner.temp }}/unity-stderr.log

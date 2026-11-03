@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Step 3: generates a small math question with 3 answer options.
-// (Gameplay-driven questions arrive in step 12.)
+// Step 12: half the questions are built from real gameplay stats.
 public static class MathPuzzle
 {
     public struct Question
@@ -14,31 +14,44 @@ public static class MathPuzzle
 
     public static Question Generate()
     {
+        int mode = Random.Range(0, 4);
+        if (mode == 0 && GameState.Coins > 0)
+        {
+            int b = Random.Range(1, 11);
+            return Build($"{GameState.Coins} coins + {b} = ?", GameState.Coins + b);
+        }
+        if (mode == 1 && GameState.Kills > 0)
+        {
+            int b = Random.Range(2, 6);
+            return Build($"{GameState.Kills} kills x {b} = ?", GameState.Kills * b);
+        }
+        if (mode == 2 && GameState.DamageTaken > 0)
+        {
+            int b = Random.Range(1, Mathf.Min(GameState.DamageTaken, 20) + 1);
+            return Build($"{GameState.DamageTaken} damage - {b} = ?", GameState.DamageTaken - b);
+        }
+        return Plain();
+    }
+
+    private static Question Plain()
+    {
         int op = Random.Range(0, 3);
-        int a, b, answer;
-        string text;
         if (op == 0)
         {
-            a = Random.Range(2, 20);
-            b = Random.Range(2, 20);
-            answer = a + b;
-            text = $"{a} + {b} = ?";
+            int a = Random.Range(2, 20), b = Random.Range(2, 20);
+            return Build($"{a} + {b} = ?", a + b);
         }
-        else if (op == 1)
+        if (op == 1)
         {
-            a = Random.Range(5, 25);
-            b = Random.Range(2, a);
-            answer = a - b;
-            text = $"{a} - {b} = ?";
+            int a = Random.Range(5, 25), b = Random.Range(2, a);
+            return Build($"{a} - {b} = ?", a - b);
         }
-        else
-        {
-            a = Random.Range(2, 10);
-            b = Random.Range(2, 10);
-            answer = a * b;
-            text = $"{a} x {b} = ?";
-        }
+        int x = Random.Range(2, 10), y = Random.Range(2, 10);
+        return Build($"{x} x {y} = ?", x * y);
+    }
 
+    private static Question Build(string text, int answer)
+    {
         // 3 unique non-negative options including the answer.
         HashSet<int> used = new HashSet<int> { answer };
         List<int> options = new List<int> { answer };

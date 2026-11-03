@@ -36,7 +36,10 @@ only, and game-ci deleted their activation helper action. So the job runs on
 your own PC, where Unity is already activated. No secrets needed.
 
 One-time runner setup (on the build PC, which needs git + git-lfs and the
-Unity Editor above):
+Unity Editor above). Then allow the runner to execute its scripts
+(elevated PowerShell, one time only):
+`Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine`
+
 
 1. Repo page > Settings > Actions > Runners > New self-hosted runner >
    Windows. Download the runner package and extract it to a folder that is
@@ -59,6 +62,10 @@ Notes:
 - The CI APK is debug-signed, same as the local build.
 - If Unity is installed at a different path, update `UNITY_PATH` in the
   workflow file.
+- Never open the runner's `_work` project copy in the Unity Editor: a second
+  Unity instance makes the build abort within seconds with an empty-looking
+  log. If a run's Unity step finishes in seconds with no APK, kill any stale
+  `Unity.exe`, delete the runner's `_work\dungeon-master` folder, and re-run.
 - Alternative if you ever get a paid Unity seat: a `UNITY_SERIAL` secret lets
   the build run on GitHub-hosted runners via game-ci instead.
 
