@@ -4,18 +4,12 @@ using UnityEngine;
 // halls; counts come from the level config in step 10.
 public class MonsterSpawner : MonoBehaviour
 {
-    private static readonly Vector3[] SpawnPoints = new Vector3[]
-    {
-        new Vector3(-2f, 1f, -7f),
-        new Vector3(7f, 1f, 2f),
-        new Vector3(24f, 1f, -4f),
-    };
-
     private void Awake()
     {
-        int count = Mathf.Min(GameConfig.Current.monsterCount, SpawnPoints.Length);
+        LevelData cfg = GameConfig.Current;
+        int count = Mathf.Min(cfg.monsterCount, cfg.monsterSpots.Length);
         for (int i = 0; i < count; i++)
-            Spawn(SpawnPoints[i]);
+            Spawn(cfg.monsterSpots[i]);
     }
 
     public static void Spawn(Vector3 position)

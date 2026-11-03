@@ -6,55 +6,22 @@ using UnityEngine;
 // Step 10: spawn counts come from the level config; positions stay curated.
 public class CollectiblePlacer : MonoBehaviour
 {
-    private static readonly Vector3[] CoinSpots = new Vector3[]
-    {
-        new Vector3(-3f, 0.6f, -3f),
-        new Vector3(0f, 0.6f, 6f),
-        new Vector3(3f, 0.6f, 0f),
-        new Vector3(6f, 0.6f, -4f),
-        new Vector3(-6f, 0.6f, 3f),
-        new Vector3(12f, 0.6f, 0f),
-        new Vector3(16f, 0.6f, 0f),
-        new Vector3(20f, 0.6f, -4f),
-        new Vector3(28f, 0.6f, 4f),
-        new Vector3(30f, 0.6f, -4f),
-    };
-
-    private static readonly Vector3[] PowerSpots = new Vector3[]
-    {
-        new Vector3(6f, 0.6f, 6f),
-        new Vector3(22f, 0.6f, 4f),
-        new Vector3(29f, 0.6f, 0f),
-    };
-
     private static readonly PowerUpKind[] PowerKinds = new PowerUpKind[]
     {
         PowerUpKind.Speed, PowerUpKind.Health, PowerUpKind.Shield,
     };
 
-    private static readonly Vector3[] ChestSpots = new Vector3[]
-    {
-        new Vector3(-8f, 0f, 8f),
-        new Vector3(30f, 0f, 5f),
-    };
-
-    private static readonly Vector3[] LockedSpots = new Vector3[]
-    {
-        new Vector3(8f, 0f, -8f),
-        new Vector3(27f, 0f, -5f),
-    };
-
     private void Awake()
     {
         LevelData cfg = GameConfig.Current;
-        for (int i = 0; i < Mathf.Min(cfg.coinCount, CoinSpots.Length); i++)
-            CreateCoin(CoinSpots[i]);
-        for (int i = 0; i < Mathf.Min(cfg.powerUpCount, PowerSpots.Length); i++)
-            CreatePowerUp(PowerSpots[i], PowerKinds[i % PowerKinds.Length]);
-        for (int i = 0; i < Mathf.Min(cfg.chestCount, ChestSpots.Length); i++)
-            CreateChest(ChestSpots[i]);
-        for (int i = 0; i < Mathf.Min(cfg.lockedChestCount, LockedSpots.Length); i++)
-            CreateChest(LockedSpots[i], true);
+        for (int i = 0; i < Mathf.Min(cfg.coinCount, cfg.coinSpots.Length); i++)
+            CreateCoin(cfg.coinSpots[i]);
+        for (int i = 0; i < Mathf.Min(cfg.powerUpCount, cfg.powerUpSpots.Length); i++)
+            CreatePowerUp(cfg.powerUpSpots[i], PowerKinds[i % PowerKinds.Length]);
+        for (int i = 0; i < Mathf.Min(cfg.chestCount, cfg.chestSpots.Length); i++)
+            CreateChest(cfg.chestSpots[i]);
+        for (int i = 0; i < Mathf.Min(cfg.lockedChestCount, cfg.lockedChestSpots.Length); i++)
+            CreateChest(cfg.lockedChestSpots[i], true);
     }
 
     public static GameObject CreateCoin(Vector3 position)

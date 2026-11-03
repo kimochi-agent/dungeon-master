@@ -1,1 +1,64 @@
-{"chestCount": 2, "coinCount": 10, "lockedChestCount": 2, "monsterCount": 3, "monsterDamage": 10, "monsterHealth": 30, "monsterSpeed": 3.0, "playerMaxHealth": 100, "playerMoveSpeed": 5.0, "powerUpCount": 3, "puzzleTimeLimit": 10.0}
+{
+  "levelName": "The Entry Halls",
+  "playerMaxHealth": 100,
+  "playerMoveSpeed": 5.0,
+  "coinCount": 10,
+  "powerUpCount": 3,
+  "chestCount": 2,
+  "lockedChestCount": 2,
+  "monsterCount": 3,
+  "monsterDamage": 10,
+  "monsterHealth": 30,
+  "monsterSpeed": 3.0,
+  "puzzleTimeLimit": 10.0,
+  "playerSpawn": {"x": -6.0, "y": 1.0, "z": 0.0},
+  "exitPoint": {"x": 46.0, "y": 1.0, "z": 0.0},
+  "rooms": [
+    {"center": {"x": 0.0, "y": 0.0}, "size": {"x": 20.0, "y": 20.0}},
+    {"center": {"x": 25.0, "y": 0.0}, "size": {"x": 14.0, "y": 14.0}},
+    {"center": {"x": 46.0, "y": 0.0}, "size": {"x": 12.0, "y": 12.0}}
+  ],
+  "corridors": [
+    {"from": {"x": 10.0, "y": 0.0}, "to": {"x": 18.0, "y": 0.0}, "width": 4.0},
+    {"from": {"x": 32.0, "y": 0.0}, "to": {"x": 40.0, "y": 0.0}, "width": 4.0}
+  ],
+  "doors": [
+    {"position": {"x": 18.0, "y": 1.5, "z": 0.0}, "alongX": true},
+    {"position": {"x": 32.0, "y": 1.5, "z": 0.0}, "alongX": true}
+  ],
+  "pillars": [
+    {"x": -5.0, "y": 0.0, "z": -5.0},
+    {"x": -5.0, "y": 0.0, "z": 5.0},
+    {"x": 25.0, "y": 0.0, "z": 3.0}
+  ],
+  "coinSpots": [
+    {"x": -3.0, "y": 0.6, "z": -3.0},
+    {"x": 0.0, "y": 0.6, "z": 6.0},
+    {"x": 3.0, "y": 0.6, "z": 0.0},
+    {"x": 6.0, "y": 0.6, "z": -4.0},
+    {"x": -6.0, "y": 0.6, "z": 3.0},
+    {"x": 12.0, "y": 0.6, "z": 0.0},
+    {"x": 16.0, "y": 0.6, "z": 0.0},
+    {"x": 20.0, "y": 0.6, "z": -4.0},
+    {"x": 28.0, "y": 0.6, "z": 4.0},
+    {"x": 30.0, "y": 0.6, "z": -4.0}
+  ],
+  "powerUpSpots": [
+    {"x": 6.0, "y": 0.6, "z": 6.0},
+    {"x": 22.0, "y": 0.6, "z": 4.0},
+    {"x": 29.0, "y": 0.6, "z": 0.0}
+  ],
+  "chestSpots": [
+    {"x": -8.0, "y": 0.0, "z": 8.0},
+    {"x": 30.0, "y": 0.0, "z": 5.0}
+  ],
+  "lockedChestSpots": [
+    {"x": 8.0, "y": 0.0, "z": -8.0},
+    {"x": 27.0, "y": 0.0, "z": -5.0}
+  ],
+  "monsterSpots": [
+    {"x": -2.0, "y": 1.0, "z": -7.0},
+    {"x": 7.0, "y": 1.0, "z": 2.0},
+    {"x": 24.0, "y": 1.0, "z": -4.0}
+  ]
+}

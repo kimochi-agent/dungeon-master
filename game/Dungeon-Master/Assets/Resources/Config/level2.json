@@ -1,0 +1,56 @@
+{
+  "levelName": "The Sunken Turn",
+  "playerMaxHealth": 100,
+  "playerMoveSpeed": 5.0,
+  "coinCount": 6,
+  "powerUpCount": 2,
+  "chestCount": 1,
+  "lockedChestCount": 1,
+  "monsterCount": 4,
+  "monsterDamage": 15,
+  "monsterHealth": 40,
+  "monsterSpeed": 3.5,
+  "puzzleTimeLimit": 8.0,
+  "playerSpawn": {"x": -5.0, "y": 1.0, "z": -5.0},
+  "exitPoint": {"x": 19.0, "y": 1.0, "z": -22.0},
+  "rooms": [
+    {"center": {"x": 0.0, "y": 0.0}, "size": {"x": 16.0, "y": 16.0}},
+    {"center": {"x": 0.0, "y": -22.0}, "size": {"x": 12.0, "y": 12.0}},
+    {"center": {"x": 19.0, "y": -22.0}, "size": {"x": 10.0, "y": 10.0}}
+  ],
+  "corridors": [
+    {"from": {"x": 0.0, "y": -8.0}, "to": {"x": 0.0, "y": -16.0}, "width": 4.0},
+    {"from": {"x": 6.0, "y": -22.0}, "to": {"x": 14.0, "y": -22.0}, "width": 4.0}
+  ],
+  "doors": [
+    {"position": {"x": 0.0, "y": 1.5, "z": -16.0}, "alongX": false}
+  ],
+  "pillars": [
+    {"x": 4.0, "y": 0.0, "z": 4.0},
+    {"x": 21.0, "y": 0.0, "z": -24.0}
+  ],
+  "coinSpots": [
+    {"x": -4.0, "y": 0.6, "z": -4.0},
+    {"x": 3.0, "y": 0.6, "z": -3.0},
+    {"x": -3.0, "y": 0.6, "z": -20.0},
+    {"x": 3.0, "y": 0.6, "z": -25.0},
+    {"x": 17.0, "y": 0.6, "z": -20.0},
+    {"x": 16.0, "y": 0.6, "z": -25.0}
+  ],
+  "powerUpSpots": [
+    {"x": 0.0, "y": 0.6, "z": 6.0},
+    {"x": -4.0, "y": 0.6, "z": -24.0}
+  ],
+  "chestSpots": [
+    {"x": -6.0, "y": 0.0, "z": 6.0}
+  ],
+  "lockedChestSpots": [
+    {"x": 22.0, "y": 0.0, "z": -19.0}
+  ],
+  "monsterSpots": [
+    {"x": 5.0, "y": 1.0, "z": -5.0},
+    {"x": -4.0, "y": 1.0, "z": -20.0},
+    {"x": 4.0, "y": 1.0, "z": -25.0},
+    {"x": 19.0, "y": 1.0, "z": -19.0}
+  ]
+}

@@ -23,6 +23,7 @@ public class HomeScreen : MonoBehaviour
     {
         Time.timeScale = 1f;
         GameState.Reset();
+        GameConfig.LoadLevel(1);
         SceneManager.LoadScene(SceneNames.Dungeon);
     }
 

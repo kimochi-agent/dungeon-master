@@ -48,10 +48,26 @@ public class GameShell : MonoBehaviour
 
         // Step 13 (additive): reaching hall C clears the dungeon.
         if (IsPlaying && !won && dungeon != null && player != null &&
-            Vector3.Distance(player.position, dungeon.HallCCenter) < 5f)
+            Vector3.Distance(player.position, dungeon.ExitPoint) < 5f)
         {
             won = true;
-            ShowGameOver("Victory!", $"You cleared the dungeon!\nCoins: {GameState.Coins}  Kills: {GameState.Kills}");
+            OnLevelComplete();
+        }
+    }
+
+    private void OnLevelComplete()
+    {
+        int next = GameConfig.LevelIndex + 1;
+        if (GameConfig.HasLevel(next))
+        {
+            GameState.Reset();
+            GameConfig.LoadLevel(next);
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        else
+        {
+            ShowGameOver("Victory!", $"You cleared all {GameConfig.LevelCount} levels!\nCoins: {GameState.Coins}  Kills: {GameState.Kills}");
         }
     }
 
@@ -62,6 +78,7 @@ public class GameShell : MonoBehaviour
         Time.timeScale = 1f;
         IsPlaying = true;
         Cursor.lockState = CursorLockMode.Locked; // First-person: capture mouse.
+        HUD.Instance?.ShowToast($"Level {GameConfig.LevelIndex}");
     }
 
     public void Pause()
