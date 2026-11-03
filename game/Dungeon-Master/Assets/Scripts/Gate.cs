@@ -32,6 +32,7 @@ public class Gate : MonoBehaviour, IPuzzleLock
         if (opened)
             return;
         opened = true;
+        LevelAnalytics.RecordGateOpened();
         StartCoroutine(Sink());
     }
 

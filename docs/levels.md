@@ -43,3 +43,19 @@ Layout keys (optional; missing/empty arrays fall back to the Level 1 layout):
 - Keep spots inside room bounds and clear of pillars/walls.
 - `level1.json` is the straight 3-hall layout; `level2.json` is an L-shaped
   3-room variant — copy either as a starting point.
+
+## Analytics (feeds the future difficulty endpoint)
+
+`LevelAnalytics` (`Assets/Scripts/Analytics/LevelAnalytics.cs`) records a
+`LevelReport` per level, persisted immediately to PlayerPrefs as JSON:
+
+- `attempts`, `deaths`, `completions` — runs started, failed, cleared.
+- `kills`, `coinsCollected`, `damageTaken` — run-stat deltas per attempt.
+- `chestsOpened`, `lockedChestsOpened`, `lockedChestsDestroyed`, `gatesOpened`.
+- `bestClearTimeSeconds`, `totalPlayTimeSeconds`, `lastPlayedUtc`.
+
+`GetPayload(levelIndex)` returns one level's report as a JSON string, ready to
+POST; `GetAllPayloads()` returns the whole campaign history. When the
+generator API exists, POST the cleared level's payload, take the returned
+`levelN+1` JSON, and load it via `GameConfig.LoadLevel` — no other code
+changes needed.

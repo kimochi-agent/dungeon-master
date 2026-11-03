@@ -57,6 +57,7 @@ public class GameShell : MonoBehaviour
 
     private void OnLevelComplete()
     {
+        LevelAnalytics.OnAttemptEnd(LevelEndReason.Completed);
         int next = GameConfig.LevelIndex + 1;
         if (GameConfig.HasLevel(next))
         {
@@ -79,6 +80,7 @@ public class GameShell : MonoBehaviour
         IsPlaying = true;
         Cursor.lockState = CursorLockMode.Locked; // First-person: capture mouse.
         HUD.Instance?.ShowToast($"Level {GameConfig.LevelIndex}");
+        LevelAnalytics.BeginLevel(GameConfig.LevelIndex, GameConfig.Current.levelName);
     }
 
     public void Pause()
@@ -102,6 +104,7 @@ public class GameShell : MonoBehaviour
     // Play Again: reload the Dungeon scene straight back into the run.
     public void Restart()
     {
+        LevelAnalytics.OnAttemptEnd(LevelEndReason.Abandoned);
         Time.timeScale = 1f;
         GameState.Reset();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -110,6 +113,7 @@ public class GameShell : MonoBehaviour
     // Home: back to the home scene.
     public void GoHome()
     {
+        LevelAnalytics.OnAttemptEnd(LevelEndReason.Abandoned);
         Time.timeScale = 1f;
         GameState.Reset();
         SceneManager.LoadScene(SceneNames.Home);

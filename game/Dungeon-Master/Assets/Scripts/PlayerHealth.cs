@@ -48,6 +48,7 @@ public class PlayerHealth : MonoBehaviour
         if (CurrentHealth <= 0)
         {
             IsDead = true;
+            LevelAnalytics.OnAttemptEnd(LevelEndReason.Died);
             if (GameShell.Instance != null)
                 GameShell.Instance.ShowGameOver("Game Over",
                     $"You died in the dungeon.\nCoins: {GameState.Coins}  Kills: {GameState.Kills}");

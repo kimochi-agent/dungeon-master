@@ -13,6 +13,7 @@ public class Chest : Collectible, IPuzzleLock
 
     public void OnPuzzleFailed()
     {
+        LevelAnalytics.RecordChestDestroyed();
         Destroy(gameObject); // No loot, no retry: a failed chest is gone.
     }
 
@@ -49,12 +50,13 @@ public class Chest : Collectible, IPuzzleLock
     public void UnlockAndOpen()
     {
         isLocked = false;
-        Open();
+        Open(true);
     }
 
-    private void Open()
+    private void Open(bool wasLocked = false)
     {
         opened = true;
+        LevelAnalytics.RecordChestOpened(wasLocked);
         if (lidPivot != null)
             lidPivot.localRotation = Quaternion.Euler(-100f, 0f, 0f);
         for (int i = 0; i < coinsInside; i++)
