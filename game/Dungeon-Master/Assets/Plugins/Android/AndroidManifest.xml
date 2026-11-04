@@ -2,8 +2,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
   <!-- Dev only: allow cleartext HTTP so device builds can reach the level
        generator on the dev PC (http://127.0.0.1:8124 via "adb reverse").
-       Merged by Unity with the generated manifest. Remove for release /
-       hosted builds (https). See docs/android-build.md. -->
+       Remove for release / hosted builds (https). See docs/android-build.md.
+       NOTE: this file replaces Unity's default main manifest, so it must
+       re-declare the game activity (launcher filter, theme, Unity
+       meta-data); everything else merges in from Unity's library
+       manifests. Verified: merged output equals the no-override build
+       plus usesCleartextTraffic (aapt xmltree diff, 2026-11-04). -->
   <application android:usesCleartextTraffic="true">
+    <activity android:name="com.unity3d.player.UnityPlayerGameActivity"
+              android:theme="@style/UnityThemeSelector"
+              android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+      <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+      <meta-data android:name="android.app.lib_name" android:value="game" />
+    </activity>
   </application>
 </manifest>
