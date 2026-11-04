@@ -37,9 +37,13 @@ Device builds fetch generated levels from your PC:
 
 Notes:
 
-- The build allows cleartext HTTP (`Assets/Plugins/Android/AndroidManifest.xml`,
-  dev only) so `http://` reaches the tunnel; without it, downloads fail
-  silently back to bundled levels. Remove before release / hosted builds.
+- The build allows cleartext HTTP (dev only, via the additive library manifest
+  `Assets/Plugins/Android/CleartextLib.androidlib/AndroidManifest.xml`) so
+  `http://` reaches the tunnel; without it, downloads fail silently back to
+  bundled levels. Never add a main-manifest override at
+  `Assets/Plugins/Android/AndroidManifest.xml` — it replaces Unity's default
+  (this broke the launcher, then crashed on theme). Remove before release /
+  hosted builds.
 - To point at another host without rebuilding, push a one-line URL file to
   `api_base_url.txt` in the app's `persistentDataPath` (on most devices:
   `/storage/emulated/0/Android/data/<package>/files/`, where `<package>` is
