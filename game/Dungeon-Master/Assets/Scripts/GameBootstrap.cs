@@ -88,6 +88,11 @@ public static class GameBootstrap
         GameObject spawner = new GameObject("MonsterSpawner");
         spawner.AddComponent<MonsterSpawner>();
 
+        // Level downloads (additive): fetch generated levels; the runner
+        // survives scene loads (singleton) so Home can use it too.
+        GameObject downloader = new GameObject("LevelDownloader");
+        downloader.AddComponent<LevelDownloader>();
+
         // Step 9 (additive): melee attack.
         player.AddComponent<PlayerAttack>();
 

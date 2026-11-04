@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Dev only: allow cleartext HTTP so device builds can reach the level
+       generator on the dev PC (http://127.0.0.1:8124 via "adb reverse").
+       Merged by Unity with the generated manifest. Remove for release /
+       hosted builds (https). See docs/android-build.md. -->
+  <application android:usesCleartextTraffic="true">
+  </application>
+</manifest>

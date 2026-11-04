@@ -23,6 +23,30 @@
 - Fresh-clone check: clone the repo somewhere new, open `game/Dungeon-Master`
   in Hub, build again — it must work with no manual setup.
 
+## Level generator (dev)
+
+Device builds fetch generated levels from your PC:
+
+1. Start the service on the PC: `python level_generator/app.py`
+   (listens on `http://127.0.0.1:8124`).
+2. Tunnel it to the phone: `adb reverse tcp:8124 tcp:8124`
+   (verify with `adb reverse --list`).
+3. Play: clearing level 1 downloads level 2; `adb logcat` shows
+   `LevelDownloader: level 2 downloaded (...)` and
+   `GameConfig: level 2 loaded from download.`
+
+Notes:
+
+- The build allows cleartext HTTP (`Assets/Plugins/Android/AndroidManifest.xml`,
+  dev only) so `http://` reaches the tunnel; without it, downloads fail
+  silently back to bundled levels. Remove before release / hosted builds.
+- To point at another host without rebuilding, push a one-line URL file to
+  `api_base_url.txt` in the app's `persistentDataPath` (on most devices:
+  `/storage/emulated/0/Android/data/<package>/files/`, where `<package>` is
+  the Player Settings application identifier).
+- No network (or API down) is always safe: the game plays the bundled
+  campaign with no error UI.
+
 ## GitHub Actions (automatic APK on push)
 
 `.github/workflows/build-android.yml` runs the same `BuildScript.BuildAndroid`

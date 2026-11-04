@@ -137,11 +137,10 @@ public static class LevelAnalytics
         return JsonUtility.ToJson(store);
     }
 
-    // ---- Future endpoint (not wired yet) ----
-    // When the generator API exists: POST GetPayload(clearedLevel) to it,
-    // take the levelN+1 JSON it returns, and load it as the next LevelData
-    // (see GameConfig.LoadLevel). Until then the bundled levelN.json files
-    // are the whole campaign.
+    // ---- Generator endpoint (wired via LevelDownloader) ----
+    // LevelDownloader POSTs GetPayload(clearedLevel) after each clear and
+    // saves the returned config; GameConfig prefers downloads over the
+    // bundled levelN.json files, which remain the offline fallback.
 
     private static void EnsureLoaded()
     {

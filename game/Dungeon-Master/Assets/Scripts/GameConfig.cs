@@ -174,9 +174,14 @@ public class LevelData
     }
 }
 
+public enum LevelSource { Bundled, Downloaded }
+
 public static class GameConfig
 {
     public static int LevelIndex { get; private set; } = 1;
+
+    // Where the current level came from; logged on every load.
+    public static LevelSource Source { get; private set; } = LevelSource.Bundled;
 
     private static LevelData current;
     private static int levelCount = -1; // Cached campaign length.
@@ -199,6 +204,18 @@ public static class GameConfig
 
     public static bool HasLevel(int index)
     {
+        if (index < 1)
+            return false;
+        LevelData downloaded;
+        string downloadError;
+        if (LevelDownloader.CheckDownloaded(index, out downloaded, out downloadError)
+            == LevelDownloader.DownloadStatus.Valid)
+            return true;
+        return HasBundled(index);
+    }
+
+    private static bool HasBundled(int index)
+    {
         return index >= 1 && Resources.Load<TextAsset>($"Config/level{index}") != null;
     }
 
@@ -208,17 +225,44 @@ public static class GameConfig
         {
             if (levelCount < 0)
             {
-                levelCount = 0;
-                while (HasLevel(levelCount + 1))
-                    levelCount++;
-                levelCount = Mathf.Max(1, levelCount);
+                int bundled = 0;
+                while (HasBundled(bundled + 1))
+                    bundled++;
+                int downloaded = 0;
+                LevelData data;
+                string error;
+                while (LevelDownloader.CheckDownloaded(downloaded + 1, out data, out error)
+                    == LevelDownloader.DownloadStatus.Valid)
+                    downloaded++;
+                levelCount = Mathf.Max(1, Mathf.Max(bundled, downloaded));
             }
             return levelCount;
         }
     }
 
+    // Downloads land after this may have been cached; call after each save.
+    public static void RefreshLevels()
+    {
+        levelCount = -1;
+    }
+
     private static LevelData Load(int index)
     {
+        LevelData downloaded;
+        string downloadError;
+        LevelDownloader.DownloadStatus status =
+            LevelDownloader.CheckDownloaded(index, out downloaded, out downloadError);
+        if (status == LevelDownloader.DownloadStatus.Valid)
+        {
+            Source = LevelSource.Downloaded;
+            Debug.Log($"GameConfig: level {index} loaded from download.");
+            return downloaded;
+        }
+        if (status == LevelDownloader.DownloadStatus.Invalid)
+        {
+            Debug.LogWarning($"GameConfig: deleting invalid level {index} download ({downloadError}).");
+            LevelDownloader.DeleteDownload(index);
+        }
         try
         {
             TextAsset asset = Resources.Load<TextAsset>($"Config/level{index}");
@@ -226,6 +270,8 @@ public static class GameConfig
             {
                 LevelData data = JsonUtility.FromJson<LevelData>(asset.text);
                 data.FillDefaults();
+                Source = LevelSource.Bundled;
+                Debug.Log($"GameConfig: level {index} loaded from bundled config.");
                 return data;
             }
             Debug.LogWarning($"Level config {index} missing, using defaults.");
@@ -234,6 +280,7 @@ public static class GameConfig
         {
             Debug.LogWarning($"Level config not loaded, using defaults: {e.Message}");
         }
+        Source = LevelSource.Bundled;
         LevelData fallback = new LevelData();
         fallback.FillDefaults();
         return fallback;

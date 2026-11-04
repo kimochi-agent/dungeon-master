@@ -12,6 +12,10 @@ drop in `level3.json` and it joins the campaign automatically.
   level-complete screen (run coins, kills, chests); Continue returns home,
   and finishing the last level shows "Campaign Complete!" there.
 - Death → end screen; Play Again restarts the *current* level.
+- Generated levels: clearing level N POSTs its analytics and downloads
+  level N+1 (see Downloaded levels below). Home retries a missing next
+  level on every visit; "Campaign Complete!" now means no bundled level
+  and no download available (e.g. offline past the bundled campaign).
 - Per-run stats (coins, kills, damage) reset each level; lifetime coin total
   persists. New file = new row in this loop; analytics-driven generation
   (difficulty from attempts, chests opened, kills) should write these files.
@@ -46,7 +50,30 @@ Layout keys (optional; missing/empty arrays fall back to the Level 1 layout):
 - `level1.json` is the straight 3-hall layout; `level2.json` is an L-shaped
   3-room variant — copy either as a starting point.
 
-## Analytics (feeds the future difficulty endpoint)
+## Downloaded levels
+
+`LevelDownloader` (`Assets/Scripts/LevelDownloader.cs`) POSTs the cleared
+level's `LevelReport` to `POST {base}/api/levels/next` (contract:
+`level_generator/contract.md`) and saves the returned config:
+
+- Storage: `Application.persistentDataPath/levels/levelN.json` (config only,
+  same schema as bundled) plus `levelN.meta.json` (provenance: layout id,
+  hash, seed, generator version, difficulty).
+- Precedence: `GameConfig` loads a valid download over the bundled file;
+  `HasLevel`/`LevelCount` count downloads too. Check `adb logcat` for
+  `GameConfig: level N loaded from download|bundled config.`
+- Validation: downloads must pass strict client checks
+  (`LevelValidator`, mirroring `level_generator/validate.py`) before
+  loading; invalid files are deleted and bundled is used.
+- Idempotency: a saved valid level is never re-requested or overwritten.
+- Timing: the fetch starts on level-complete and never blocks navigation;
+  Home refreshes its Play button live when a fetch lands.
+- Offline: any failure (no network, bad response, timeout) silently keeps
+  bundled levels; nothing user-visible breaks.
+- Base URL: `http://127.0.0.1:8124` by default, overrideable without a
+  rebuild via an `api_base_url.txt` file in `persistentDataPath`.
+
+## Analytics (feeds the difficulty endpoint)
 
 `LevelAnalytics` (`Assets/Scripts/Analytics/LevelAnalytics.cs`) records a
 `LevelReport` per level, persisted immediately to PlayerPrefs as JSON:
@@ -56,8 +83,7 @@ Layout keys (optional; missing/empty arrays fall back to the Level 1 layout):
 - `chestsOpened`, `lockedChestsOpened`, `lockedChestsDestroyed`, `gatesOpened`.
 - `bestClearTimeSeconds`, `totalPlayTimeSeconds`, `lastPlayedUtc`.
 
-`GetPayload(levelIndex)` returns one level's report as a JSON string, ready to
-POST; `GetAllPayloads()` returns the whole campaign history. When the
-generator API exists, POST the cleared level's payload, take the returned
-`levelN+1` JSON, and load it via `GameConfig.LoadLevel` — no other code
-changes needed.
+`GetPayload(levelIndex)` returns one level's report as a JSON string, which
+`LevelDownloader` POSTs (see Downloaded levels above). `GetAllPayloads()`
+returns the whole campaign history. Future tuning work can correlate play
+data with served layouts via the `layoutHash` in each `levelN.meta.json`.

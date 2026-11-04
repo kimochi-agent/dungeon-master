@@ -10,6 +10,8 @@ using UnityEngine.UI;
 public class HomeScreen : MonoBehaviour
 {
     private GameObject settingsPanel;
+    private Button continueButton;
+    private Text completeText;
 
     private void Awake()
     {
@@ -17,6 +19,23 @@ public class HomeScreen : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         EnsureEventSystem();
         Build();
+        LevelDownloader.StateChanged += RefreshNext;
+        if (GameState.NextLevel > 1 && !GameConfig.HasLevel(GameState.NextLevel))
+            LevelDownloader.FetchNext(GameState.NextLevel - 1);
+    }
+
+    private void OnDestroy()
+    {
+        LevelDownloader.StateChanged -= RefreshNext;
+    }
+
+    private void RefreshNext()
+    {
+        if (continueButton == null || completeText == null)
+            return;
+        bool hasNext = GameConfig.HasLevel(GameState.NextLevel);
+        continueButton.gameObject.SetActive(hasNext);
+        completeText.gameObject.SetActive(!hasNext && GameState.NextLevel > 1);
     }
 
     public void StartRun()
@@ -83,11 +102,9 @@ public class HomeScreen : MonoBehaviour
         MakeText(panel.transform, $"Total Coins: {GameState.TotalCoins}", 24, new Vector2(0f, 108f), new Vector2(440f, 40f), font);
         string startLabel = GameState.NextLevel > 1 ? "Replay Level 1" : "Start";
         MakeButton(panel.transform, startLabel, new Vector2(0f, 40f), font, StartRun);
-        bool hasNext = GameConfig.HasLevel(GameState.NextLevel);
-        Button continueButton = MakeButton(panel.transform, $"Play Level {GameState.NextLevel}", new Vector2(0f, -27f), font, ContinueRun);
-        continueButton.gameObject.SetActive(hasNext);
-        Text completeText = MakeText(panel.transform, "Campaign Complete!", 24, new Vector2(0f, -27f), new Vector2(440f, 40f), font);
-        completeText.gameObject.SetActive(!hasNext && GameState.NextLevel > 1);
+        continueButton = MakeButton(panel.transform, $"Play Level {GameState.NextLevel}", new Vector2(0f, -27f), font, ContinueRun);
+        completeText = MakeText(panel.transform, "Campaign Complete!", 24, new Vector2(0f, -27f), new Vector2(440f, 40f), font);
+        RefreshNext();
         MakeButton(panel.transform, "Settings", new Vector2(0f, -94f), font, OpenSettings);
         MakeButton(panel.transform, "Exit", new Vector2(0f, -161f), font, ExitGame);
         MakeText(panel.transform, "Left stick: move | Drag screen: look | Red button: attack", 16, new Vector2(0f, -212f), new Vector2(440f, 24f), font);

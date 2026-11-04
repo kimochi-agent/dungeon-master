@@ -22,6 +22,7 @@ public class GameShell : MonoBehaviour
     private GameObject completePanel;
     private Text completeTitle;
     private Text completeStats;
+    private Text fetchStatus;
     private bool won; // Step 13 (additive).
     private DungeonGenerator dungeon; // Step 13 (additive).
     private Transform player; // Step 13 (additive).
@@ -35,7 +36,14 @@ public class GameShell : MonoBehaviour
         var controller = FindFirstObjectByType<PlayerController>(); // Step 13 (additive).
         if (controller != null)
             player = controller.transform;
+        LevelDownloader.StateChanged += RefreshFetchStatus;
+        RefreshFetchStatus();
         StartGame();
+    }
+
+    private void OnDestroy()
+    {
+        LevelDownloader.StateChanged -= RefreshFetchStatus;
     }
 
     private void Update()
@@ -63,6 +71,7 @@ public class GameShell : MonoBehaviour
     {
         LevelAnalytics.OnAttemptEnd(LevelEndReason.Completed);
         GameState.UnlockLevel(GameConfig.LevelIndex + 1);
+        LevelDownloader.FetchNext(GameConfig.LevelIndex);
         ShowLevelComplete();
     }
 
@@ -142,6 +151,16 @@ public class GameShell : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
     }
 
+    private void RefreshFetchStatus()
+    {
+        if (fetchStatus == null)
+            return;
+        // Best-effort status only; failures stay silent (bundled fallback).
+        fetchStatus.text = LevelDownloader.State == LevelDownloader.FetchState.Fetching
+            ? "Fetching next level..."
+            : "";
+    }
+
     private void EnsureEventSystem()
     {
         if (EventSystem.current != null)
@@ -177,6 +196,7 @@ public class GameShell : MonoBehaviour
         completePanel = Panel(canvasGo.transform, "LevelComplete", new Vector2(480f, 340f));
         completeTitle = MakeText(completePanel.transform, "", 38, new Vector2(0f, 115f), new Vector2(440f, 50f), font);
         completeStats = MakeText(completePanel.transform, "", 24, new Vector2(0f, 30f), new Vector2(440f, 100f), font);
+        fetchStatus = MakeText(completePanel.transform, "", 18, new Vector2(0f, -62f), new Vector2(440f, 28f), font);
         MakeButton(completePanel.transform, "Continue", new Vector2(0f, -105f), font, GoHome);
 
         // Small pause button, bottom-right, always visible during play.
