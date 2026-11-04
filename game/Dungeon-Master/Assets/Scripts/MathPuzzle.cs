@@ -15,20 +15,36 @@ public static class MathPuzzle
     public static Question Generate()
     {
         int mode = Random.Range(0, 4);
+        int op = Random.Range(0, 3);
         if (mode == 0 && GameState.Coins > 0)
         {
             int b = Random.Range(1, 11);
-            return Build($"{GameState.Coins} coins + {b} = ?", GameState.Coins + b);
+            if (op == 0)
+                return Build($"{GameState.Coins} + {b} = ?", GameState.Coins + b);
+            else if (op == 1)
+                return Build($"{GameState.Coins} - {b} = ?", GameState.Coins - b);
+            else
+                return Build($"{GameState.Coins} x {b} = ?", GameState.Coins * b);
         }
         if (mode == 1 && GameState.Kills > 0)
         {
             int b = Random.Range(2, 6);
-            return Build($"{GameState.Kills} kills x {b} = ?", GameState.Kills * b);
+            if (op == 0)
+                return Build($"{GameState.Kills} + {b} = ?", GameState.Kills + b);
+            else if (op == 1)
+                return Build($"{GameState.Kills} - {b} = ?", GameState.Kills - b);
+            else
+                return Build($"{GameState.Kills} x {b} = ?", GameState.Kills * b);
         }
         if (mode == 2 && GameState.DamageTaken > 0)
         {
             int b = Random.Range(1, Mathf.Min(GameState.DamageTaken, 20) + 1);
-            return Build($"{GameState.DamageTaken} damage - {b} = ?", GameState.DamageTaken - b);
+            if (op == 0)
+                return Build($"{GameState.DamageTaken} + {b} = ?", GameState.DamageTaken + b);
+            else if (op == 1)
+                return Build($"{GameState.DamageTaken} - {b} = ?", GameState.DamageTaken - b);
+            else
+                return Build($"{GameState.DamageTaken} x {b} = ?", GameState.DamageTaken * b);
         }
         return Plain();
     }

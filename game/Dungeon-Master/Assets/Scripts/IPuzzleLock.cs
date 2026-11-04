@@ -9,4 +9,5 @@ public interface IPuzzleLock
     bool DestroyOnFail { get; }
     float TimeLimitSeconds { get; } // Countdown; <= 0 means untimed.
     void OnPuzzleFailed();
+    string GetTypeOfLock(); // "chest" or "gate".
 }

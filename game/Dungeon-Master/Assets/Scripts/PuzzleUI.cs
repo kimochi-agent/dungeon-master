@@ -28,6 +28,7 @@ public class PuzzleUI : MonoBehaviour
     private GameObject panel;
     private Text questionText;
     private Text feedbackText;
+    private Text titleText;
     private Text timerLabel;
     private float timeLimit;
     private float timeLeft;
@@ -52,6 +53,7 @@ public class PuzzleUI : MonoBehaviour
             return; // No popups over pause/end screens.
         EnsureBuilt();
         currentLock = puzzleLock;
+        titleText.text = "Locked " + puzzleLock.GetTypeOfLock();
         current = MathPuzzle.Generate();
         questionText.text = current.text;
         for (int i = 0; i < 3; i++)
@@ -193,7 +195,7 @@ public class PuzzleUI : MonoBehaviour
         pr.offsetMax = Vector2.zero;
         panel.AddComponent<Image>().color = new Color(0.95f, 0.93f, 0.88f);
 
-        MakeRowText(panel.transform, "Locked Chest", 26, 0.87f, 0.97f, font);
+        titleText = MakeRowText(panel.transform, "Locked", 26, 0.87f, 0.97f, font);
         timerLabel = MakeRowText(panel.transform, "10s", 24, 0.79f, 0.86f, font);
         timerLabel.color = new Color(0.8f, 0.15f, 0.15f);
         questionText = MakeRowText(panel.transform, "?", 36, 0.60f, 0.78f, font);

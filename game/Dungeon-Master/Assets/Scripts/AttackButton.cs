@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.UI;
 
 // Circular attack button, bottom-right (where the look stick was). A quick
@@ -30,7 +31,8 @@ public class AttackButton : MonoBehaviour
     private GameObject root;
     private RectTransform baseRt;
     private Image baseImage;
-    private int activeTouchId = -1;
+    private TouchControl activeTouch;
+    private Touchscreen trackedScreen;
     private Vector2 pressPos;
     private float pressTime;
 
@@ -44,7 +46,8 @@ public class AttackButton : MonoBehaviour
         attackQueued = false;
         ZoneCenterPx = Vector2.zero;
         ZoneRadiusPx = 0f;
-        activeTouchId = -1;
+        activeTouch = null;
+        trackedScreen = null;
     }
 
     private void Update()
@@ -56,7 +59,7 @@ public class AttackButton : MonoBehaviour
             attackQueued = false;
             ZoneCenterPx = Vector2.zero;
             ZoneRadiusPx = 0f;
-            activeTouchId = -1;
+            activeTouch = null;
             return;
         }
         root.SetActive(true);
@@ -66,41 +69,45 @@ public class AttackButton : MonoBehaviour
         ZoneCenterPx = basePx;
         ZoneRadiusPx = radiusPx;
 
-        bool found = false;
-        foreach (var touch in screen.touches)
+        if (activeTouch != null && ReferenceEquals(screen, trackedScreen))
         {
-            int id = touch.touchId.ReadValue();
-            var phase = touch.phase.ReadValue();
-            if (id == activeTouchId)
+            var phase = activeTouch.phase.ReadValue();
+            if (phase == UnityEngine.InputSystem.TouchPhase.Ended)
             {
-                found = true;
-                if (phase == UnityEngine.InputSystem.TouchPhase.Ended)
-                {
-                    Vector2 pos = touch.position.ReadValue();
-                    if (Time.time - pressTime < TapMaxSeconds &&
-                        Vector2.Distance(pos, pressPos) < TapMaxMovePx &&
-                        (GameShell.Instance == null || GameShell.Instance.IsPlaying))
-                        attackQueued = true;
-                    activeTouchId = -1;
-                }
-                else if (phase == UnityEngine.InputSystem.TouchPhase.Canceled ||
-                         phase == UnityEngine.InputSystem.TouchPhase.None)
-                {
-                    activeTouchId = -1;
-                }
+                Vector2 pos = activeTouch.position.ReadValue();
+                if (Time.time - pressTime < TapMaxSeconds &&
+                    Vector2.Distance(pos, pressPos) < TapMaxMovePx &&
+                    (GameShell.Instance == null || GameShell.Instance.IsPlaying))
+                    attackQueued = true;
+                activeTouch = null;
             }
-            else if (activeTouchId == -1 && phase == UnityEngine.InputSystem.TouchPhase.Began &&
-                     Vector2.Distance(touch.position.ReadValue(), basePx) < radiusPx)
+            else if (phase == UnityEngine.InputSystem.TouchPhase.Canceled ||
+                     phase == UnityEngine.InputSystem.TouchPhase.None ||
+                     phase == UnityEngine.InputSystem.TouchPhase.Began)
             {
-                activeTouchId = id;
-                pressPos = touch.position.ReadValue();
-                pressTime = Time.time;
-                found = true;
+                activeTouch = null; // Released, or slot reused by a new touch; rescan below.
             }
         }
-        if (activeTouchId != -1 && !found)
-            activeTouchId = -1;
-        baseImage.color = activeTouchId != -1 ? PressedColor : IdleColor;
+        else
+        {
+            activeTouch = null;
+            trackedScreen = screen;
+        }
+        if (activeTouch == null)
+        {
+            foreach (var touch in screen.touches)
+            {
+                if (touch.phase.ReadValue() == UnityEngine.InputSystem.TouchPhase.Began &&
+                    Vector2.Distance(touch.position.ReadValue(), basePx) < radiusPx)
+                {
+                    activeTouch = touch;
+                    pressPos = touch.position.ReadValue();
+                    pressTime = Time.time;
+                    break;
+                }
+            }
+        }
+        baseImage.color = activeTouch != null ? PressedColor : IdleColor;
     }
 
     private void Build()

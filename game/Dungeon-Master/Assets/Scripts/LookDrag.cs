@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 // Invisible full-screen drag look (touch only): dragging anywhere turns the
 // camera, replacing the circular look stick (TouchJoystick.cs, kept unused).
@@ -18,12 +19,14 @@ public class LookDrag : MonoBehaviour
         return d;
     }
 
-    private int activeTouchId = -1;
+    private TouchControl activeTouch;
+    private Touchscreen trackedScreen;
 
     private void OnDestroy()
     {
         pendingPx = Vector2.zero;
-        activeTouchId = -1;
+        activeTouch = null;
+        trackedScreen = null;
     }
 
     private void Update()
@@ -31,29 +34,39 @@ public class LookDrag : MonoBehaviour
         var screen = Touchscreen.current;
         if (screen == null || !CanLook())
         {
-            activeTouchId = -1;
+            activeTouch = null;
             pendingPx = Vector2.zero;
             return;
         }
+        if (activeTouch != null && ReferenceEquals(screen, trackedScreen))
+        {
+            var phase = activeTouch.phase.ReadValue();
+            if (phase == UnityEngine.InputSystem.TouchPhase.Ended ||
+                phase == UnityEngine.InputSystem.TouchPhase.Canceled ||
+                phase == UnityEngine.InputSystem.TouchPhase.None ||
+                phase == UnityEngine.InputSystem.TouchPhase.Began)
+                activeTouch = null; // Released, or slot reused by a new touch; rescan below.
+            else
+            {
+                pendingPx += activeTouch.delta.ReadValue();
+                return;
+            }
+        }
+        else
+        {
+            activeTouch = null;
+            trackedScreen = screen;
+        }
         foreach (var touch in screen.touches)
         {
-            int id = touch.touchId.ReadValue();
-            var phase = touch.phase.ReadValue();
-            if (id == activeTouchId)
+            if (touch.phase.ReadValue() != UnityEngine.InputSystem.TouchPhase.Began)
+                continue;
+            Vector2 pos = touch.position.ReadValue();
+            if (!InZone(pos, MoveJoystick.ZoneCenterPx, MoveJoystick.ZoneRadiusPx) &&
+                !InZone(pos, AttackButton.ZoneCenterPx, AttackButton.ZoneRadiusPx))
             {
-                if (phase == UnityEngine.InputSystem.TouchPhase.Ended ||
-                    phase == UnityEngine.InputSystem.TouchPhase.Canceled ||
-                    phase == UnityEngine.InputSystem.TouchPhase.None)
-                    activeTouchId = -1;
-                else
-                    pendingPx += touch.delta.ReadValue();
-            }
-            else if (activeTouchId == -1 && phase == UnityEngine.InputSystem.TouchPhase.Began)
-            {
-                Vector2 pos = touch.position.ReadValue();
-                if (!InZone(pos, MoveJoystick.ZoneCenterPx, MoveJoystick.ZoneRadiusPx) &&
-                    !InZone(pos, AttackButton.ZoneCenterPx, AttackButton.ZoneRadiusPx))
-                    activeTouchId = id;
+                activeTouch = touch;
+                break;
             }
         }
     }

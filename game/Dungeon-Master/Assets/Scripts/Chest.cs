@@ -53,6 +53,11 @@ public class Chest : Collectible, IPuzzleLock
         Open(true);
     }
 
+    public string GetTypeOfLock()
+    {
+        return "Chest";
+    }
+    
     private void Open(bool wasLocked = false)
     {
         opened = true;

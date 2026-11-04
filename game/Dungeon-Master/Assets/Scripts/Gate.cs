@@ -36,6 +36,11 @@ public class Gate : MonoBehaviour, IPuzzleLock
         StartCoroutine(Sink());
     }
 
+    public string GetTypeOfLock()
+    {
+        return "Gate";
+    }
+
     private IEnumerator Sink()
     {
         Vector3 start = transform.position;

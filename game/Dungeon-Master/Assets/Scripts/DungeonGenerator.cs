@@ -89,8 +89,9 @@ public class DungeonGenerator : MonoBehaviour
         go.transform.position = door.position;
         go.transform.localScale = door.alongX ? new Vector3(1f, 3f, 3.9f) : new Vector3(3.9f, 3f, 1f);
         Renderer renderer = go.GetComponent<Renderer>();
-        renderer.sharedMaterial = SharedMaterials.Tinted(renderer, new Color(0.2f, 0.2f, 0.24f));
+        renderer.sharedMaterial = SharedMaterials.Tinted(renderer, new Color(0.27f, 0.17f, 0.10f));
         go.AddComponent<Gate>();
+        GateVisual.Attach(go);
     }
 
     // One room side: full wall minus merged corridor/door gaps.
